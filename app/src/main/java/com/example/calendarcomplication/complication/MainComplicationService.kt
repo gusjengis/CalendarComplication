@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.drawable.Icon
+import android.util.Log
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationType
 import androidx.wear.watchface.complications.data.EmptyComplicationData
@@ -13,22 +14,31 @@ import androidx.wear.watchface.complications.data.PhotoImageComplicationData
 import androidx.wear.watchface.complications.data.PlainComplicationText
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
+import com.example.calendarcomplication.R
 import java.util.Calendar
 
 class MainComplicationService : SuspendingComplicationDataSourceService() {
 
-    override fun getPreviewData(type: ComplicationType): ComplicationData? {
-        if (type != ComplicationType.PHOTO_IMAGE) return null
+    companion object {
+        private const val TAG = "MainComplicationService"
+    }
 
-        val bitmap = generateBitmap("PREVIEW")
-        val icon = Icon.createWithBitmap(bitmap)
+    override fun getPreviewData(type: ComplicationType): ComplicationData? {
+        Log.d(TAG, "FUCK getPreviewData called for type: $type") // 4. LOG WHEN PREVIEW IS REQUESTED
+
+        if (type != ComplicationType.PHOTO_IMAGE) {
+            Log.w(TAG, "FUCK Unsupported preview type requested. Returning null.")
+            return null
+        }
+
+        Log.d(TAG, "FUCK Providing PHOTO_IMAGE preview.")
+        val icon = Icon.createWithResource(this, R.drawable.tile_preview)
 
         return PhotoImageComplicationData.Builder(
             photoImage = icon,
             contentDescription = PlainComplicationText.Builder("Preview calendar image").build()
         ).build()
     }
-
     override suspend fun onComplicationRequest(
         request: ComplicationRequest
     ): ComplicationData {
