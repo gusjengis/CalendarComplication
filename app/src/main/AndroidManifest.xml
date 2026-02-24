@@ -24,10 +24,7 @@
 
             <meta-data
                 android:name="android.support.wearable.complications.SUPPORTED_TYPES"
-                android:value="PHOTO_IMAGE SHORT_TEXT" />
-            <meta-data
-                android:name="android.support.wearable.complications.SUPPORTED_FAMILIES"
-                android:value="COMPLICATION_FAMILY_PHOTO_IMAGE,COMPLICATION_FAMILY_GRAPHIC_CIRCULAR" />
+                android:value="LARGE_IMAGE" />
             <meta-data
                 android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS"
                 android:value="0" />
