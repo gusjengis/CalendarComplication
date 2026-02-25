@@ -10,6 +10,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.graphics.RectF
 import android.graphics.drawable.Icon
 import android.net.Uri
 import android.util.Log
@@ -85,10 +86,12 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
 
         return try {
             val now = System.currentTimeMillis()
+            val dayBounds = localDayBounds(now)
             val dayEnd = now + 24L * 60L * 60L * 1000L
             val weekEnd = now + 7L * 24L * 60L * 60L * 1000L
 
             val raw = loadWearableEventsRaw(now, weekEnd)
+            val todayRaw = loadWearableEventsRaw(dayBounds.startMillis, dayBounds.endMillis)
             val events24h = raw.events.filter { overlapsRange(it, now, dayEnd) }
             val accountSummary = raw.accountHint?.takeIf { it.isNotBlank() } ?: "unavailable"
 
@@ -99,14 +102,20 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 status = "CALENDAR ACCESS OK",
                 detail = detail,
                 account = "Account: $accountSummary",
-                sync = "sync: wearable managed"
+                sync = "sync: wearable managed",
+                dayEvents = todayRaw.events,
+                dayStartMillis = dayBounds.startMillis,
+                dayEndMillis = dayBounds.endMillis
             )
         } catch (t: Throwable) {
             CalendarProbeResult(
                 status = "CALENDAR READ ERROR",
                 detail = t.javaClass.simpleName,
                 account = "Account: unavailable",
-                sync = "sync: wearable managed"
+                sync = "sync: wearable managed",
+                dayEvents = emptyList(),
+                dayStartMillis = 0L,
+                dayEndMillis = 0L
             )
         }
     }
@@ -136,6 +145,9 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
             val startIndex = firstExistingColumnIndex(cursor, listOf("begin", "dtstart", "start", "startTime"))
             val endIndex = firstExistingColumnIndex(cursor, listOf("end", "dtend", "endTime"))
             val accountIndex = firstExistingColumnIndex(cursor, listOf("ownerAccount", "account_name", "organizer"))
+            val eventColorIndex = cursor.getColumnIndex("eventColor")
+            val calendarColorIndex = cursor.getColumnIndex("calendar_color")
+            val displayColorIndex = cursor.getColumnIndex("displayColor")
 
             while (cursor.moveToNext()) {
                 val start = normalizeEpochMillis(getLongCompat(cursor, startIndex))
@@ -152,11 +164,18 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 events.add(
                     CalendarEventStub(
                         startMillis = start,
-                        endMillis = end
+                        endMillis = end,
+                        color = resolveEventColor(
+                            displayColor = getNullableColorCompat(cursor, displayColorIndex),
+                            eventColor = getNullableColorCompat(cursor, eventColorIndex),
+                            calendarColor = getNullableColorCompat(cursor, calendarColorIndex)
+                        )
                     )
                 )
             }
         }
+
+        events.sortBy { it.startMillis }
 
         return WearableEventsRaw(
             events = events,
@@ -193,6 +212,26 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
         }
     }
 
+    private fun getNullableColorCompat(cursor: Cursor, index: Int): Int? {
+        if (index < 0 || cursor.isNull(index)) {
+            return null
+        }
+        val color = when (cursor.getType(index)) {
+            Cursor.FIELD_TYPE_INTEGER -> cursor.getInt(index)
+            Cursor.FIELD_TYPE_FLOAT -> cursor.getDouble(index).toInt()
+            Cursor.FIELD_TYPE_STRING -> cursor.getString(index)?.toIntOrNull()
+            else -> null
+        }
+        if (color == null || color == 0) {
+            return null
+        }
+        return color
+    }
+
+    private fun resolveEventColor(displayColor: Int?, eventColor: Int?, calendarColor: Int?): Int {
+        return displayColor ?: eventColor ?: calendarColor ?: Color.rgb(120, 120, 120)
+    }
+
     private fun normalizeEpochMillis(value: Long): Long {
         if (value <= 0L) {
             return value
@@ -207,6 +246,20 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
 
     private fun overlapsRange(event: CalendarEventStub, startMillis: Long, endMillis: Long): Boolean {
         return event.endMillis >= startMillis && event.startMillis <= endMillis
+    }
+
+    private fun localDayBounds(nowMillis: Long): DayBounds {
+        val calendar = java.util.Calendar.getInstance().apply {
+            timeInMillis = nowMillis
+            set(java.util.Calendar.HOUR_OF_DAY, 0)
+            set(java.util.Calendar.MINUTE, 0)
+            set(java.util.Calendar.SECOND, 0)
+            set(java.util.Calendar.MILLISECOND, 0)
+        }
+        val start = calendar.timeInMillis
+        calendar.add(java.util.Calendar.DAY_OF_YEAR, 1)
+        val end = calendar.timeInMillis
+        return DayBounds(startMillis = start, endMillis = end)
     }
 
     private fun generateStatusBitmap(probe: CalendarProbeResult): Bitmap {
@@ -228,7 +281,43 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
             strokeWidth = 14f
             isAntiAlias = true
         }
-        canvas.drawCircle(center, center, center - 18f, ringPaint)
+        val ringRadius = center - 18f
+        canvas.drawCircle(center, center, ringRadius, ringPaint)
+
+        if (probe.dayStartMillis > 0L && probe.dayEndMillis > probe.dayStartMillis) {
+            val ringRect = RectF(
+                center - ringRadius,
+                center - ringRadius,
+                center + ringRadius,
+                center + ringRadius
+            )
+            val arcPaint = Paint().apply {
+                style = Paint.Style.STROKE
+                strokeWidth = 14f
+                strokeCap = Paint.Cap.BUTT
+                isAntiAlias = true
+            }
+            val dayDuration = probe.dayEndMillis - probe.dayStartMillis
+
+            for (event in probe.dayEvents) {
+                val clippedStart = maxOf(event.startMillis, probe.dayStartMillis)
+                val clippedEnd = minOf(event.endMillis, probe.dayEndMillis)
+                if (clippedEnd <= clippedStart) {
+                    continue
+                }
+
+                val startFraction = (clippedStart - probe.dayStartMillis).toFloat() / dayDuration.toFloat()
+                val endFraction = (clippedEnd - probe.dayStartMillis).toFloat() / dayDuration.toFloat()
+                val startDegrees = -90f + (startFraction * 360f)
+                val sweepDegrees = (endFraction - startFraction) * 360f
+                if (sweepDegrees <= 0f) {
+                    continue
+                }
+
+                arcPaint.color = event.color
+                canvas.drawArc(ringRect, startDegrees, sweepDegrees, false, arcPaint)
+            }
+        }
 
         val statusPaint = Paint().apply {
             color = Color.WHITE
@@ -281,16 +370,25 @@ private data class CalendarProbeResult(
     val status: String,
     val detail: String,
     val account: String,
-    val sync: String
+    val sync: String,
+    val dayEvents: List<CalendarEventStub> = emptyList(),
+    val dayStartMillis: Long = 0L,
+    val dayEndMillis: Long = 0L
 )
 
 private data class CalendarEventStub(
     val startMillis: Long,
-    val endMillis: Long
+    val endMillis: Long,
+    val color: Int
 )
 
 private data class WearableEventsRaw(
     val events: List<CalendarEventStub>,
     val rawCount: Int,
     val accountHint: String?
+)
+
+private data class DayBounds(
+    val startMillis: Long,
+    val endMillis: Long
 )
