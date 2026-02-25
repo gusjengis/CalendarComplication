@@ -34,7 +34,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
     companion object {
         private const val TAG = "MainComplicationService"
         private const val IMAGE_SIZE = 450
-        private const val TICK_MS = 1_000L
+        private const val TICK_MS = 60_000L
 
         private val WEARABLE_PROVIDER_BASE_URI: Uri =
             Uri.parse("content://com.google.android.wearable.provider.calendar")
@@ -416,9 +416,8 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
         val hour12Raw = nowCal.get(java.util.Calendar.HOUR)
         val hour12 = if (hour12Raw == 0) 12 else hour12Raw
         val minute = nowCal.get(java.util.Calendar.MINUTE)
-        val second = nowCal.get(java.util.Calendar.SECOND)
-        val amPm = if (nowCal.get(java.util.Calendar.AM_PM) == java.util.Calendar.AM) "" else ""
-        val timeText = String.format(Locale.getDefault(), "%d:%02d:%02d", hour12, minute, second)
+        val amPm = if (nowCal.get(java.util.Calendar.AM_PM) == java.util.Calendar.AM) "AM" else "PM"
+        val timeText = String.format(Locale.getDefault(), "%d:%02d", hour12, minute)
 
         val clockChipPaint = Paint().apply {
             color = Color.argb(170, 10, 12, 16)
