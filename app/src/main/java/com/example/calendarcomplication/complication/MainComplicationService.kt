@@ -25,6 +25,7 @@ import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUp
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import java.util.Collections
+import java.util.Locale
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -33,7 +34,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
     companion object {
         private const val TAG = "MainComplicationService"
         private const val IMAGE_SIZE = 450
-        private const val MINUTE_MS = 60_000L
+        private const val TICK_MS = 1_000L
 
         private val WEARABLE_PROVIDER_BASE_URI: Uri =
             Uri.parse("content://com.google.android.wearable.provider.calendar")
@@ -60,7 +61,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
             forceUpdateNow(this@MainComplicationService)
 
             val now = System.currentTimeMillis()
-            val delay = MINUTE_MS - (now % MINUTE_MS)
+            val delay = TICK_MS - (now % TICK_MS)
             mainHandler.postDelayed(this, delay)
         }
     }
@@ -130,7 +131,8 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
         mainHandler.removeCallbacks(minuteTicker)
 
         val now = System.currentTimeMillis()
-        val firstDelay = MINUTE_MS - (now % MINUTE_MS)
+        val firstDelay = TICK_MS - (now % TICK_MS)
+        forceUpdateNow(this)
         mainHandler.postDelayed(minuteTicker, firstDelay)
     }
 
@@ -409,6 +411,52 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 canvas.drawLine(x1, y1, x2, y2, markerPaint)
             }
         }
+
+        val nowCal = java.util.Calendar.getInstance()
+        val hour12Raw = nowCal.get(java.util.Calendar.HOUR)
+        val hour12 = if (hour12Raw == 0) 12 else hour12Raw
+        val minute = nowCal.get(java.util.Calendar.MINUTE)
+        val second = nowCal.get(java.util.Calendar.SECOND)
+        val amPm = if (nowCal.get(java.util.Calendar.AM_PM) == java.util.Calendar.AM) "" else ""
+        val timeText = String.format(Locale.getDefault(), "%d:%02d:%02d", hour12, minute, second)
+
+        val clockChipPaint = Paint().apply {
+            color = Color.argb(170, 10, 12, 16)
+            style = Paint.Style.FILL
+            isAntiAlias = true
+        }
+        val clockChipStroke = Paint().apply {
+            color = Color.argb(160, 180, 180, 190)
+            style = Paint.Style.STROKE
+            strokeWidth = 2f
+            isAntiAlias = true
+        }
+        val chipRect = RectF(center - 132f, center - 42f, center + 132f, center + 42f)
+        canvas.drawRoundRect(chipRect, 20f, 20f, clockChipPaint)
+        canvas.drawRoundRect(chipRect, 20f, 20f, clockChipStroke)
+
+        val timeShadowPaint = Paint().apply {
+            color = Color.argb(170, 0, 0, 0)
+            textSize = 52f
+            textAlign = Paint.Align.CENTER
+            isAntiAlias = true
+        }
+        val timePaint = Paint().apply {
+            color = Color.rgb(236, 242, 255)
+            textSize = 52f
+            textAlign = Paint.Align.CENTER
+            isAntiAlias = true
+        }
+        val amPmPaint = Paint().apply {
+            color = Color.rgb(172, 196, 255)
+            textSize = 20f
+            textAlign = Paint.Align.CENTER
+            isAntiAlias = true
+        }
+
+        canvas.drawText(timeText, center + 1f, center + 16f, timeShadowPaint)
+        canvas.drawText(timeText, center, center + 15f, timePaint)
+        canvas.drawText(amPm, center, center + 35f, amPmPaint)
 
         return bitmap
     }
