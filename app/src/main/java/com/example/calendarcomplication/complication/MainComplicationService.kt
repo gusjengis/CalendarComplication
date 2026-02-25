@@ -9,10 +9,11 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.Icon
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.wear.watchface.complications.data.ComplicationData
@@ -23,12 +24,16 @@ import androidx.wear.watchface.complications.data.PlainComplicationText
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
+import java.util.Collections
+import kotlin.math.cos
+import kotlin.math.sin
 
 class MainComplicationService : SuspendingComplicationDataSourceService() {
 
     companion object {
         private const val TAG = "MainComplicationService"
         private const val IMAGE_SIZE = 450
+        private const val MINUTE_MS = 60_000L
 
         private val WEARABLE_PROVIDER_BASE_URI: Uri =
             Uri.parse("content://com.google.android.wearable.provider.calendar")
@@ -39,6 +44,24 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 ComponentName(context, MainComplicationService::class.java)
             )
             requester.requestUpdateAll()
+        }
+    }
+
+    private val activePhotoComplicationIds = Collections.synchronizedSet(mutableSetOf<Int>())
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private var tickerRunning = false
+
+    private val minuteTicker = object : Runnable {
+        override fun run() {
+            if (!tickerRunning) {
+                return
+            }
+
+            forceUpdateNow(this@MainComplicationService)
+
+            val now = System.currentTimeMillis()
+            val delay = MINUTE_MS - (now % MINUTE_MS)
+            mainHandler.postDelayed(this, delay)
         }
     }
 
@@ -65,6 +88,9 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
             return EmptyComplicationData()
         }
 
+        activePhotoComplicationIds.add(request.complicationInstanceId)
+        startTickerIfNeeded()
+
         val probe = probeCalendarDataAccess()
         Log.d(TAG, "Calendar probe: ${probe.status} (${probe.detail})")
 
@@ -72,6 +98,45 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
             photoImage = Icon.createWithBitmap(generateStatusBitmap(probe)),
             contentDescription = PlainComplicationText.Builder("Calendar ring status").build()
         ).build()
+    }
+
+    override fun onComplicationActivated(complicationInstanceId: Int, type: ComplicationType) {
+        super.onComplicationActivated(complicationInstanceId, type)
+        if (type == ComplicationType.PHOTO_IMAGE) {
+            activePhotoComplicationIds.add(complicationInstanceId)
+            startTickerIfNeeded()
+        }
+    }
+
+    override fun onComplicationDeactivated(complicationInstanceId: Int) {
+        super.onComplicationDeactivated(complicationInstanceId)
+        activePhotoComplicationIds.remove(complicationInstanceId)
+        if (activePhotoComplicationIds.isEmpty()) {
+            stopTicker()
+        }
+    }
+
+    override fun onDestroy() {
+        stopTicker()
+        super.onDestroy()
+    }
+
+    private fun startTickerIfNeeded() {
+        if (tickerRunning || activePhotoComplicationIds.isEmpty()) {
+            return
+        }
+
+        tickerRunning = true
+        mainHandler.removeCallbacks(minuteTicker)
+
+        val now = System.currentTimeMillis()
+        val firstDelay = MINUTE_MS - (now % MINUTE_MS)
+        mainHandler.postDelayed(minuteTicker, firstDelay)
+    }
+
+    private fun stopTicker() {
+        tickerRunning = false
+        mainHandler.removeCallbacks(minuteTicker)
     }
 
     private fun probeCalendarDataAccess(): CalendarProbeResult {
@@ -317,52 +382,35 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 arcPaint.color = event.color
                 canvas.drawArc(ringRect, startDegrees, sweepDegrees, false, arcPaint)
             }
-        }
 
-        val statusPaint = Paint().apply {
-            color = Color.WHITE
-            textSize = 30f
-            textAlign = Paint.Align.CENTER
-            isAntiAlias = true
-        }
+            val now = System.currentTimeMillis()
+            if (dayDuration > 0L) {
+                val nowFraction = ((now - probe.dayStartMillis).toDouble() / dayDuration.toDouble())
+                    .toFloat()
+                    .coerceIn(0f, 1f)
+                val nowDegrees = -90f + (nowFraction * 360f)
+                val nowRadians = Math.toRadians(nowDegrees.toDouble())
 
-        val detailPaint = Paint().apply {
-            color = Color.rgb(170, 170, 170)
-            textSize = 22f
-            textAlign = Paint.Align.CENTER
-            isAntiAlias = true
-        }
+                val markerPaint = Paint().apply {
+                    color = Color.WHITE
+                    style = Paint.Style.STROKE
+                    strokeWidth = 5f
+                    strokeCap = Paint.Cap.ROUND
+                    isAntiAlias = true
+                }
 
-        drawCenteredTextBlock(
-            canvas = canvas,
-            centerX = center,
-            centerY = center,
-            lines = listOf("CALENDAR RING", probe.status, probe.detail, probe.account, probe.sync),
-            paints = listOf(statusPaint, statusPaint, detailPaint, detailPaint, detailPaint),
-            lineSpacing = 34f
-        )
+                val inner = ringRadius - 12f
+                val outer = ringRadius + 12f
+                val x1 = center + (cos(nowRadians) * inner).toFloat()
+                val y1 = center + (sin(nowRadians) * inner).toFloat()
+                val x2 = center + (cos(nowRadians) * outer).toFloat()
+                val y2 = center + (sin(nowRadians) * outer).toFloat()
+
+                canvas.drawLine(x1, y1, x2, y2, markerPaint)
+            }
+        }
 
         return bitmap
-    }
-
-    private fun drawCenteredTextBlock(
-        canvas: Canvas,
-        centerX: Float,
-        centerY: Float,
-        lines: List<String>,
-        paints: List<Paint>,
-        lineSpacing: Float
-    ) {
-        val totalHeight = lineSpacing * (lines.size - 1)
-        var y = centerY - totalHeight / 2f
-
-        for (i in lines.indices) {
-            val paint = paints[i]
-            val bounds = Rect()
-            paint.getTextBounds(lines[i], 0, lines[i].length, bounds)
-            canvas.drawText(lines[i], centerX, y + bounds.height() / 2f, paint)
-            y += lineSpacing
-        }
     }
 }
 
