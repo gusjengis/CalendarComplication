@@ -390,6 +390,18 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 val nowFraction = ((now - probe.dayStartMillis).toDouble() / dayDuration.toDouble())
                     .toFloat()
                     .coerceIn(0f, 1f)
+                val passedSweepDegrees = nowFraction * 360f
+                if (passedSweepDegrees > 0f) {
+                    val dimPaint = Paint().apply {
+                        color = Color.argb(140, 0, 0, 0)
+                        style = Paint.Style.STROKE
+                        strokeWidth = 14f
+                        strokeCap = Paint.Cap.BUTT
+                        isAntiAlias = true
+                    }
+                    canvas.drawArc(ringRect, -90f, passedSweepDegrees, false, dimPaint)
+                }
+
                 val nowDegrees = -90f + (nowFraction * 360f)
                 val nowRadians = Math.toRadians(nowDegrees.toDouble())
 
@@ -418,21 +430,6 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
         val minute = nowCal.get(java.util.Calendar.MINUTE)
         val amPm = if (nowCal.get(java.util.Calendar.AM_PM) == java.util.Calendar.AM) "AM" else "PM"
         val timeText = String.format(Locale.getDefault(), "%d:%02d", hour12, minute)
-
-        val clockChipPaint = Paint().apply {
-            color = Color.argb(170, 10, 12, 16)
-            style = Paint.Style.FILL
-            isAntiAlias = true
-        }
-        val clockChipStroke = Paint().apply {
-            color = Color.argb(160, 180, 180, 190)
-            style = Paint.Style.STROKE
-            strokeWidth = 2f
-            isAntiAlias = true
-        }
-        val chipRect = RectF(center - 132f, center - 42f, center + 132f, center + 42f)
-        canvas.drawRoundRect(chipRect, 20f, 20f, clockChipPaint)
-        canvas.drawRoundRect(chipRect, 20f, 20f, clockChipStroke)
 
         val timeShadowPaint = Paint().apply {
             color = Color.argb(170, 0, 0, 0)
