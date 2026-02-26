@@ -496,9 +496,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 val textStartX: Float,
                 val textBaselineY: Float,
                 val centerX: Float,
-                val centerY: Float,
-                val isDailyRepeated: Boolean,
-                val priority: Float
+                val centerY: Float
             )
 
             data class RenderedSegment(
@@ -509,6 +507,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
             )
 
             data class ClippedEvent(
+                val eventIndex: Int,
                 val event: CalendarEventStub,
                 val startMillis: Long,
                 val endMillis: Long,
@@ -516,9 +515,21 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 val sweepDegrees: Float
             )
 
-            val labelCandidates = mutableListOf<LabelCandidate>()
+            data class EventSpan(
+                val startMillis: Long,
+                val endMillis: Long,
+                val overlapDepth: Int
+            )
+
+            data class EventLabelPlan(
+                val isDailyRepeated: Boolean,
+                val eventPriority: Float,
+                val candidates: List<LabelCandidate>
+            )
+
             val renderedSegments = mutableListOf<RenderedSegment>()
             val clippedEvents = mutableListOf<ClippedEvent>()
+            val eventSpansByIndex = mutableMapOf<Int, MutableList<EventSpan>>()
             val ringStrokeWidth = 14f
             val ringInnerRadius = ringRadius - (ringStrokeWidth / 2f)
 
@@ -539,6 +550,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
 
                 clippedEvents.add(
                     ClippedEvent(
+                        eventIndex = clippedEvents.size,
                         event = event,
                         startMillis = clippedStart,
                         endMillis = clippedEnd,
@@ -582,6 +594,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                     if (activeEvents.isEmpty()) {
                         continue
                     }
+                    val overlapDepth = activeEvents.size
 
                     val segmentStartFraction =
                         (segmentStart - probe.dayStartMillis).toFloat() / dayDuration.toFloat()
@@ -591,6 +604,25 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                     val segmentSweepDegrees = (segmentEndFraction - segmentStartFraction) * 360f
                     if (segmentSweepDegrees <= 0f) {
                         continue
+                    }
+
+                    for (activeEvent in activeEvents) {
+                        val spans = eventSpansByIndex.getOrPut(activeEvent.eventIndex) { mutableListOf() }
+                        val lastSpan = spans.lastOrNull()
+                        if (lastSpan != null &&
+                            lastSpan.endMillis == segmentStart &&
+                            lastSpan.overlapDepth == overlapDepth
+                        ) {
+                            spans[spans.lastIndex] = lastSpan.copy(endMillis = segmentEnd)
+                        } else {
+                            spans.add(
+                                EventSpan(
+                                    startMillis = segmentStart,
+                                    endMillis = segmentEnd,
+                                    overlapDepth = overlapDepth
+                                )
+                            )
+                        }
                     }
 
                     val laneWidth = ringStrokeWidth / activeEvents.size.toFloat()
@@ -612,6 +644,8 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 }
             }
 
+            val eventLabelPlans = mutableListOf<EventLabelPlan>()
+
             for (clippedEvent in clippedEvents) {
                 val event = clippedEvent.event
                 val title = event.title?.trim().orEmpty()
@@ -631,44 +665,81 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 }
                 val textWidth = labelPaint.measureText(label)
 
-                val midDegrees = clippedEvent.startDegrees + (clippedEvent.sweepDegrees / 2f)
-                val midRadians = Math.toRadians(midDegrees.toDouble())
-                val anchorX = center + (cos(midRadians) * anchorRadius).toFloat()
-                val anchorY = center + (sin(midRadians) * anchorRadius).toFloat()
-
-                val normalizedAngle = ((midDegrees % 360f) + 360f) % 360f
-                val isFlippedForReadability = normalizedAngle > 90f && normalizedAngle < 270f
-                val labelRotation = if (isFlippedForReadability) {
-                    normalizedAngle + 180f
-                } else {
-                    normalizedAngle
-                }
-
-                val textStartX = if (isFlippedForReadability) {
-                    labelRingPadding
-                } else {
-                    -(textWidth + labelRingPadding)
-                }
-                val textCenterOffset = textStartX + (textWidth / 2f)
-                val rotationRadians = Math.toRadians(labelRotation.toDouble())
-                val textCenterX = anchorX + (cos(rotationRadians) * textCenterOffset).toFloat()
-                val textCenterY = anchorY + (sin(rotationRadians) * textCenterOffset).toFloat()
-                val textBaselineY = -((labelPaint.fontMetrics.ascent + labelPaint.fontMetrics.descent) / 2f)
-
-                labelCandidates.add(
-                    LabelCandidate(
-                        label = label,
-                        anchorX = anchorX,
-                        anchorY = anchorY,
-                        rotation = labelRotation,
-                        textStartX = textStartX,
-                        textBaselineY = textBaselineY,
-                        centerX = textCenterX,
-                        centerY = textCenterY,
-                        isDailyRepeated = event.isDailyRepeated,
-                        priority = clippedEvent.sweepDegrees
+                val eventMidMillis = clippedEvent.startMillis + ((clippedEvent.endMillis - clippedEvent.startMillis) / 2L)
+                val spanCandidates = eventSpansByIndex[clippedEvent.eventIndex]
+                    .orEmpty()
+                    .ifEmpty {
+                        listOf(
+                            EventSpan(
+                                startMillis = clippedEvent.startMillis,
+                                endMillis = clippedEvent.endMillis,
+                                overlapDepth = 1
+                            )
+                        )
+                    }
+                    .sortedWith(
+                        compareBy<EventSpan> { it.overlapDepth }
+                            .thenByDescending { it.endMillis - it.startMillis }
+                            .thenBy {
+                                abs(
+                                    (it.startMillis + ((it.endMillis - it.startMillis) / 2L)) -
+                                        eventMidMillis
+                                )
+                            }
                     )
-                )
+
+                val labelCandidatesForEvent = mutableListOf<LabelCandidate>()
+                for (span in spanCandidates.take(5)) {
+                    val spanMidMillis = span.startMillis + ((span.endMillis - span.startMillis) / 2L)
+                    val midFraction =
+                        (spanMidMillis - probe.dayStartMillis).toFloat() / dayDuration.toFloat()
+                    val midDegrees = -90f + (midFraction * 360f)
+                    val midRadians = Math.toRadians(midDegrees.toDouble())
+                    val anchorX = center + (cos(midRadians) * anchorRadius).toFloat()
+                    val anchorY = center + (sin(midRadians) * anchorRadius).toFloat()
+
+                    val normalizedAngle = ((midDegrees % 360f) + 360f) % 360f
+                    val isFlippedForReadability = normalizedAngle > 90f && normalizedAngle < 270f
+                    val labelRotation = if (isFlippedForReadability) {
+                        normalizedAngle + 180f
+                    } else {
+                        normalizedAngle
+                    }
+
+                    val textStartX = if (isFlippedForReadability) {
+                        labelRingPadding
+                    } else {
+                        -(textWidth + labelRingPadding)
+                    }
+                    val textCenterOffset = textStartX + (textWidth / 2f)
+                    val rotationRadians = Math.toRadians(labelRotation.toDouble())
+                    val textCenterX = anchorX + (cos(rotationRadians) * textCenterOffset).toFloat()
+                    val textCenterY = anchorY + (sin(rotationRadians) * textCenterOffset).toFloat()
+                    val textBaselineY = -((labelPaint.fontMetrics.ascent + labelPaint.fontMetrics.descent) / 2f)
+
+                    labelCandidatesForEvent.add(
+                        LabelCandidate(
+                            label = label,
+                            anchorX = anchorX,
+                            anchorY = anchorY,
+                            rotation = labelRotation,
+                            textStartX = textStartX,
+                            textBaselineY = textBaselineY,
+                            centerX = textCenterX,
+                            centerY = textCenterY
+                        )
+                    )
+                }
+
+                if (labelCandidatesForEvent.isNotEmpty()) {
+                    eventLabelPlans.add(
+                        EventLabelPlan(
+                            isDailyRepeated = event.isDailyRepeated,
+                            eventPriority = clippedEvent.sweepDegrees,
+                            candidates = labelCandidatesForEvent
+                        )
+                    )
+                }
             }
 
             val separatorPaint = Paint().apply {
@@ -698,33 +769,36 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
             }
 
             val placedLabelCenters = mutableListOf<Pair<Float, Float>>()
-            for (candidate in labelCandidates.sortedWith(
-                compareBy<LabelCandidate> { it.isDailyRepeated }
-                    .thenByDescending { it.priority }
+            for (eventPlan in eventLabelPlans.sortedWith(
+                compareBy<EventLabelPlan> { it.isDailyRepeated }
+                    .thenByDescending { it.eventPriority }
             )) {
-                val minDistance = 28f
-                val minDistanceSq = minDistance * minDistance
-                val overlapsExisting = placedLabelCenters.any { (x, y) ->
-                    val dx = candidate.centerX - x
-                    val dy = candidate.centerY - y
-                    (dx * dx) + (dy * dy) < minDistanceSq
-                }
-                if (overlapsExisting) {
-                    continue
-                }
+                for (candidate in eventPlan.candidates) {
+                    val minDistance = 28f
+                    val minDistanceSq = minDistance * minDistance
+                    val overlapsExisting = placedLabelCenters.any { (x, y) ->
+                        val dx = candidate.centerX - x
+                        val dy = candidate.centerY - y
+                        (dx * dx) + (dy * dy) < minDistanceSq
+                    }
+                    if (overlapsExisting) {
+                        continue
+                    }
 
-                placedLabelCenters.add(candidate.centerX to candidate.centerY)
-                canvas.save()
-                canvas.translate(candidate.anchorX, candidate.anchorY)
-                canvas.rotate(candidate.rotation)
-                canvas.drawText(
-                    candidate.label,
-                    candidate.textStartX + 1f,
-                    candidate.textBaselineY + 1f,
-                    labelShadowPaint
-                )
-                canvas.drawText(candidate.label, candidate.textStartX, candidate.textBaselineY, labelPaint)
-                canvas.restore()
+                    placedLabelCenters.add(candidate.centerX to candidate.centerY)
+                    canvas.save()
+                    canvas.translate(candidate.anchorX, candidate.anchorY)
+                    canvas.rotate(candidate.rotation)
+                    canvas.drawText(
+                        candidate.label,
+                        candidate.textStartX + 1f,
+                        candidate.textBaselineY + 1f,
+                        labelShadowPaint
+                    )
+                    canvas.drawText(candidate.label, candidate.textStartX, candidate.textBaselineY, labelPaint)
+                    canvas.restore()
+                    break
+                }
             }
 
             if (dayDuration > 0L) {
