@@ -497,6 +497,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 val textBaselineY: Float,
                 val centerX: Float,
                 val centerY: Float,
+                val isDailyRepeated: Boolean,
                 val priority: Float
             )
 
@@ -507,8 +508,19 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 val color: Int
             )
 
+            data class ClippedEvent(
+                val event: CalendarEventStub,
+                val startMillis: Long,
+                val endMillis: Long,
+                val startDegrees: Float,
+                val sweepDegrees: Float
+            )
+
             val labelCandidates = mutableListOf<LabelCandidate>()
             val renderedSegments = mutableListOf<RenderedSegment>()
+            val clippedEvents = mutableListOf<ClippedEvent>()
+            val ringStrokeWidth = 14f
+            val ringInnerRadius = ringRadius - (ringStrokeWidth / 2f)
 
             for (event in probe.dayEvents) {
                 val clippedStart = maxOf(event.startMillis, probe.dayStartMillis)
@@ -525,8 +537,15 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                     continue
                 }
 
-                arcPaint.color = event.color
-                canvas.drawArc(ringRect, startDegrees, sweepDegrees, false, arcPaint)
+                clippedEvents.add(
+                    ClippedEvent(
+                        event = event,
+                        startMillis = clippedStart,
+                        endMillis = clippedEnd,
+                        startDegrees = startDegrees,
+                        sweepDegrees = sweepDegrees
+                    )
+                )
                 renderedSegments.add(
                     RenderedSegment(
                         startMillis = clippedStart,
@@ -535,7 +554,66 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                         color = event.color
                     )
                 )
+            }
 
+            if (clippedEvents.isNotEmpty()) {
+                val boundaries = mutableSetOf(probe.dayStartMillis, probe.dayEndMillis)
+                for (event in clippedEvents) {
+                    boundaries.add(event.startMillis)
+                    boundaries.add(event.endMillis)
+                }
+
+                val sortedBoundaries = boundaries.sorted()
+                for (i in 0 until sortedBoundaries.lastIndex) {
+                    val segmentStart = sortedBoundaries[i]
+                    val segmentEnd = sortedBoundaries[i + 1]
+                    if (segmentEnd <= segmentStart) {
+                        continue
+                    }
+
+                    val activeEvents = clippedEvents
+                        .filter { it.startMillis < segmentEnd && it.endMillis > segmentStart }
+                        .sortedWith(
+                            compareBy<ClippedEvent> { it.startMillis }
+                                .thenBy { it.endMillis }
+                                .thenBy { it.event.eventId }
+                                .thenBy { it.event.color }
+                        )
+                    if (activeEvents.isEmpty()) {
+                        continue
+                    }
+
+                    val segmentStartFraction =
+                        (segmentStart - probe.dayStartMillis).toFloat() / dayDuration.toFloat()
+                    val segmentEndFraction =
+                        (segmentEnd - probe.dayStartMillis).toFloat() / dayDuration.toFloat()
+                    val segmentStartDegrees = -90f + (segmentStartFraction * 360f)
+                    val segmentSweepDegrees = (segmentEndFraction - segmentStartFraction) * 360f
+                    if (segmentSweepDegrees <= 0f) {
+                        continue
+                    }
+
+                    val laneWidth = ringStrokeWidth / activeEvents.size.toFloat()
+                    activeEvents.forEachIndexed { index, activeEvent ->
+                        val laneInner = ringInnerRadius + (laneWidth * index)
+                        val laneOuter = laneInner + laneWidth
+                        val laneRadius = (laneInner + laneOuter) / 2f
+                        val laneRect = RectF(
+                            center - laneRadius,
+                            center - laneRadius,
+                            center + laneRadius,
+                            center + laneRadius
+                        )
+
+                        arcPaint.color = activeEvent.event.color
+                        arcPaint.strokeWidth = laneWidth
+                        canvas.drawArc(laneRect, segmentStartDegrees, segmentSweepDegrees, false, arcPaint)
+                    }
+                }
+            }
+
+            for (clippedEvent in clippedEvents) {
+                val event = clippedEvent.event
                 val title = event.title?.trim().orEmpty()
                 if (title.isBlank()) {
                     continue
@@ -553,7 +631,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 }
                 val textWidth = labelPaint.measureText(label)
 
-                val midDegrees = startDegrees + (sweepDegrees / 2f)
+                val midDegrees = clippedEvent.startDegrees + (clippedEvent.sweepDegrees / 2f)
                 val midRadians = Math.toRadians(midDegrees.toDouble())
                 val anchorX = center + (cos(midRadians) * anchorRadius).toFloat()
                 val anchorY = center + (sin(midRadians) * anchorRadius).toFloat()
@@ -587,7 +665,8 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                         textBaselineY = textBaselineY,
                         centerX = textCenterX,
                         centerY = textCenterY,
-                        priority = sweepDegrees
+                        isDailyRepeated = event.isDailyRepeated,
+                        priority = clippedEvent.sweepDegrees
                     )
                 )
             }
@@ -619,7 +698,10 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
             }
 
             val placedLabelCenters = mutableListOf<Pair<Float, Float>>()
-            for (candidate in labelCandidates.sortedByDescending { it.priority }) {
+            for (candidate in labelCandidates.sortedWith(
+                compareBy<LabelCandidate> { it.isDailyRepeated }
+                    .thenByDescending { it.priority }
+            )) {
                 val minDistance = 28f
                 val minDistanceSq = minDistance * minDistance
                 val overlapsExisting = placedLabelCenters.any { (x, y) ->
