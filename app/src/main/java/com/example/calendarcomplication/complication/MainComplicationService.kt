@@ -527,6 +527,14 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 val candidates: List<LabelCandidate>
             )
 
+            data class TimelineSegment(
+                val startMillis: Long,
+                val endMillis: Long,
+                val startDegrees: Float,
+                val sweepDegrees: Float,
+                val activeEvents: List<ClippedEvent>
+            )
+
             val renderedSegments = mutableListOf<RenderedSegment>()
             val clippedEvents = mutableListOf<ClippedEvent>()
             val eventSpansByIndex = mutableMapOf<Int, MutableList<EventSpan>>()
@@ -575,6 +583,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                     boundaries.add(event.endMillis)
                 }
 
+                val timelineSegments = mutableListOf<TimelineSegment>()
                 val sortedBoundaries = boundaries.sorted()
                 for (i in 0 until sortedBoundaries.lastIndex) {
                     val segmentStart = sortedBoundaries[i]
@@ -583,26 +592,8 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                         continue
                     }
 
-                    val overlappingEvents =
-                        clippedEvents.filter { it.startMillis < segmentEnd && it.endMillis > segmentStart }
-                    val containmentCountByEventIndex = overlappingEvents.associate { candidate ->
-                        val containingCount = overlappingEvents.count { other ->
-                            other.eventIndex != candidate.eventIndex &&
-                                other.startMillis <= candidate.startMillis &&
-                                other.endMillis >= candidate.endMillis
-                        }
-                        candidate.eventIndex to containingCount
-                    }
-                    val activeEvents = overlappingEvents
-                        .sortedWith(
-                            compareByDescending<ClippedEvent> {
-                                containmentCountByEventIndex[it.eventIndex] ?: 0
-                            }
-                                .thenBy { it.startMillis }
-                                .thenBy { it.endMillis }
-                                .thenBy { it.event.eventId }
-                                .thenBy { it.event.color }
-                        )
+                    val activeEvents = clippedEvents
+                        .filter { it.startMillis < segmentEnd && it.endMillis > segmentStart }
                     if (activeEvents.isEmpty()) {
                         continue
                     }
@@ -617,6 +608,16 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                     if (segmentSweepDegrees <= 0f) {
                         continue
                     }
+
+                    timelineSegments.add(
+                        TimelineSegment(
+                            startMillis = segmentStart,
+                            endMillis = segmentEnd,
+                            startDegrees = segmentStartDegrees,
+                            sweepDegrees = segmentSweepDegrees,
+                            activeEvents = activeEvents
+                        )
+                    )
 
                     for (activeEvent in activeEvents) {
                         val spans = eventSpansByIndex.getOrPut(activeEvent.eventIndex) { mutableListOf() }
@@ -636,23 +637,210 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                             )
                         }
                     }
+                }
 
-                    val laneWidth = ringStrokeWidth / activeEvents.size.toFloat()
-                    activeEvents.forEachIndexed { index, activeEvent ->
-                        val laneInner = ringInnerRadius + (laneWidth * index)
-                        val laneOuter = laneInner + laneWidth
-                        val laneRadius = (laneInner + laneOuter) / 2f
-                        val laneRect = RectF(
-                            center - laneRadius,
-                            center - laneRadius,
-                            center + laneRadius,
-                            center + laneRadius
+                var segmentIndex = 0
+                while (segmentIndex < timelineSegments.size) {
+                    val segment = timelineSegments[segmentIndex]
+                    if (segment.activeEvents.size <= 1) {
+                        val singleEvent = segment.activeEvents.first()
+                        arcPaint.color = singleEvent.event.color
+                        arcPaint.strokeWidth = ringStrokeWidth
+                        canvas.drawArc(
+                            ringRect,
+                            segment.startDegrees,
+                            segment.sweepDegrees,
+                            false,
+                            arcPaint
                         )
-
-                        arcPaint.color = activeEvent.event.color
-                        arcPaint.strokeWidth = laneWidth
-                        canvas.drawArc(laneRect, segmentStartDegrees, segmentSweepDegrees, false, arcPaint)
+                        segmentIndex += 1
+                        continue
                     }
+
+                    var clusterEndIndex = segmentIndex + 1
+                    while (clusterEndIndex < timelineSegments.size) {
+                        val previous = timelineSegments[clusterEndIndex - 1]
+                        val next = timelineSegments[clusterEndIndex]
+                        if (next.activeEvents.size <= 1 || next.startMillis != previous.endMillis) {
+                            break
+                        }
+                        clusterEndIndex += 1
+                    }
+
+                    val overlapCluster = timelineSegments.subList(segmentIndex, clusterEndIndex)
+                    val clusterDepth = overlapCluster.maxOf { it.activeEvents.size }
+                    var previousLaneEvents: IntArray? = null
+
+                    for (clusterSegment in overlapCluster) {
+                        val laneEvents = IntArray(clusterDepth) { -1 }
+                        val activeByIndex = clusterSegment.activeEvents.associateBy { it.eventIndex }
+
+                        val containmentCountByEventIndex = clusterSegment.activeEvents.associate { candidate ->
+                            val containingCount = clusterSegment.activeEvents.count { other ->
+                                other.eventIndex != candidate.eventIndex &&
+                                    other.startMillis <= candidate.startMillis &&
+                                    other.endMillis >= candidate.endMillis
+                            }
+                            candidate.eventIndex to containingCount
+                        }
+                        val durationByEventIndex = clusterSegment.activeEvents.associate {
+                            it.eventIndex to (it.endMillis - it.startMillis)
+                        }
+                        val startByEventIndex = clusterSegment.activeEvents.associate {
+                            it.eventIndex to it.startMillis
+                        }
+
+                        fun insideCompare(a: Int, b: Int): Int {
+                            val containmentA = containmentCountByEventIndex[a] ?: 0
+                            val containmentB = containmentCountByEventIndex[b] ?: 0
+                            if (containmentA != containmentB) {
+                                return containmentA.compareTo(containmentB)
+                            }
+
+                            val durationA = durationByEventIndex[a] ?: Long.MAX_VALUE
+                            val durationB = durationByEventIndex[b] ?: Long.MAX_VALUE
+                            if (durationA != durationB) {
+                                return durationB.compareTo(durationA)
+                            }
+
+                            val startA = startByEventIndex[a] ?: Long.MAX_VALUE
+                            val startB = startByEventIndex[b] ?: Long.MAX_VALUE
+                            if (startA != startB) {
+                                return startB.compareTo(startA)
+                            }
+
+                            return b.compareTo(a)
+                        }
+
+                        if (previousLaneEvents != null) {
+                            for (lane in 0 until clusterDepth) {
+                                val previousEventIndex = previousLaneEvents[lane]
+                                if (previousEventIndex >= 0 && activeByIndex.containsKey(previousEventIndex)) {
+                                    laneEvents[lane] = previousEventIndex
+                                }
+                            }
+                        }
+
+                        fun laneCounts(): MutableMap<Int, Int> {
+                            val counts = mutableMapOf<Int, Int>()
+                            for (eventIndex in laneEvents) {
+                                if (eventIndex >= 0) {
+                                    counts[eventIndex] = (counts[eventIndex] ?: 0) + 1
+                                }
+                            }
+                            return counts
+                        }
+
+                        val activeEventIndexes = clusterSegment.activeEvents.map { it.eventIndex }
+                        val eventIndexesMissingLane = {
+                            val counts = laneCounts()
+                            activeEventIndexes.filter { (counts[it] ?: 0) == 0 }
+                                .sortedWith { a, b ->
+                                    -insideCompare(a, b)
+                                }
+                        }
+
+                        for (missingEventIndex in eventIndexesMissingLane()) {
+                            var targetLane = laneEvents.indexOfFirst { it < 0 }
+                            if (targetLane < 0) {
+                                val counts = laneCounts()
+                                val donorEventIndex = activeEventIndexes
+                                    .filter { (counts[it] ?: 0) > 1 }
+                                    .minWithOrNull { a, b ->
+                                        insideCompare(a, b)
+                                    }
+
+                                if (donorEventIndex != null) {
+                                    val donorLanes = laneEvents.indices.filter { laneEvents[it] == donorEventIndex }
+                                    val missingHigherPriority = insideCompare(missingEventIndex, donorEventIndex) > 0
+                                    targetLane = if (missingHigherPriority) {
+                                        donorLanes.minOrNull() ?: -1
+                                    } else {
+                                        donorLanes.maxOrNull() ?: -1
+                                    }
+                                }
+                            }
+
+                            if (targetLane >= 0) {
+                                laneEvents[targetLane] = missingEventIndex
+                            }
+                        }
+
+                        if (eventIndexesMissingLane().isNotEmpty()) {
+                            val orderedEventIndexes = activeEventIndexes.sortedWith { a, b ->
+                                -insideCompare(a, b)
+                            }
+                            for (lane in 0 until clusterDepth) {
+                                laneEvents[lane] = orderedEventIndexes[lane.coerceAtMost(orderedEventIndexes.lastIndex)]
+                            }
+                        }
+
+                        for (lane in 0 until clusterDepth) {
+                            if (laneEvents[lane] >= 0) {
+                                continue
+                            }
+
+                            var left = lane - 1
+                            while (left >= 0 && laneEvents[left] < 0) {
+                                left -= 1
+                            }
+                            var right = lane + 1
+                            while (right < clusterDepth && laneEvents[right] < 0) {
+                                right += 1
+                            }
+
+                            val chosenEventIndex = when {
+                                left < 0 && right < clusterDepth -> laneEvents[right]
+                                right >= clusterDepth && left >= 0 -> laneEvents[left]
+                                left >= 0 && right < clusterDepth -> {
+                                    val leftDistance = lane - left
+                                    val rightDistance = right - lane
+                                    if (leftDistance <= rightDistance) laneEvents[left] else laneEvents[right]
+                                }
+
+                                else -> clusterSegment.activeEvents.first().eventIndex
+                            }
+                            laneEvents[lane] = chosenEventIndex
+                        }
+
+                        var runStart = 0
+                        while (runStart < clusterDepth) {
+                            val eventIndex = laneEvents[runStart]
+                            var runEnd = runStart + 1
+                            while (runEnd < clusterDepth && laneEvents[runEnd] == eventIndex) {
+                                runEnd += 1
+                            }
+
+                            val event = activeByIndex[eventIndex]
+                            if (event != null) {
+                                val runInner = ringInnerRadius + (ringStrokeWidth * (runStart / clusterDepth.toFloat()))
+                                val runOuter = ringInnerRadius + (ringStrokeWidth * (runEnd / clusterDepth.toFloat()))
+                                val runRadius = (runInner + runOuter) / 2f
+                                val runRect = RectF(
+                                    center - runRadius,
+                                    center - runRadius,
+                                    center + runRadius,
+                                    center + runRadius
+                                )
+
+                                arcPaint.color = event.event.color
+                                arcPaint.strokeWidth = runOuter - runInner
+                                canvas.drawArc(
+                                    runRect,
+                                    clusterSegment.startDegrees,
+                                    clusterSegment.sweepDegrees,
+                                    false,
+                                    arcPaint
+                                )
+                            }
+
+                            runStart = runEnd
+                        }
+
+                        previousLaneEvents = laneEvents
+                    }
+
+                    segmentIndex = clusterEndIndex
                 }
             }
 
