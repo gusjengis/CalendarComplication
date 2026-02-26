@@ -27,6 +27,7 @@ import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import java.util.Collections
 import java.util.Locale
+import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -437,7 +438,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
             }
             val dayDuration = probe.dayEndMillis - probe.dayStartMillis
             val labelRingPadding = 12f
-            val centerKeepoutRadius = 78f
+            val centerKeepoutRadius = 75f
             val maxLabelWidth = (ringRadius - labelRingPadding - centerKeepoutRadius).coerceAtLeast(18f)
             val anchorRadius = ringRadius
 
@@ -453,7 +454,15 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 val priority: Float
             )
 
+            data class RenderedSegment(
+                val startMillis: Long,
+                val endMillis: Long,
+                val startDegrees: Float,
+                val color: Int
+            )
+
             val labelCandidates = mutableListOf<LabelCandidate>()
+            val renderedSegments = mutableListOf<RenderedSegment>()
 
             for (event in probe.dayEvents) {
                 val clippedStart = maxOf(event.startMillis, probe.dayStartMillis)
@@ -472,6 +481,14 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
 
                 arcPaint.color = event.color
                 canvas.drawArc(ringRect, startDegrees, sweepDegrees, false, arcPaint)
+                renderedSegments.add(
+                    RenderedSegment(
+                        startMillis = clippedStart,
+                        endMillis = clippedEnd,
+                        startDegrees = startDegrees,
+                        color = event.color
+                    )
+                )
 
                 val title = event.title?.trim().orEmpty()
                 if (title.isBlank()) {
@@ -521,6 +538,32 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                         priority = sweepDegrees
                     )
                 )
+            }
+
+            val separatorPaint = Paint().apply {
+                color = Color.argb(220, 18, 18, 18)
+                style = Paint.Style.STROKE
+                strokeWidth = 2f
+                strokeCap = Paint.Cap.ROUND
+                isAntiAlias = true
+            }
+            val separatorInner = ringRadius - 7f
+            val separatorOuter = ringRadius + 7f
+            for (i in 1 until renderedSegments.size) {
+                val previous = renderedSegments[i - 1]
+                val current = renderedSegments[i]
+                val isSameColor = previous.color == current.color
+                val isAdjacentInTime = abs(current.startMillis - previous.endMillis) <= 60_000L
+                if (!isSameColor || !isAdjacentInTime) {
+                    continue
+                }
+
+                val radians = Math.toRadians(current.startDegrees.toDouble())
+                val x1 = center + (cos(radians) * separatorInner).toFloat()
+                val y1 = center + (sin(radians) * separatorInner).toFloat()
+                val x2 = center + (cos(radians) * separatorOuter).toFloat()
+                val y2 = center + (sin(radians) * separatorOuter).toFloat()
+                canvas.drawLine(x1, y1, x2, y2, separatorPaint)
             }
 
             val placedLabelCenters = mutableListOf<Pair<Float, Float>>()
