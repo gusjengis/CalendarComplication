@@ -435,7 +435,9 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
         val sizeF = IMAGE_SIZE.toFloat()
         val center = sizeF / 2f
         val showRecurringLabels = WatchSettingsStore.shouldShowRecurringLabels(this)
+        val hidePastEventLabels = WatchSettingsStore.hidePastEventLabels(this)
         val use24HourTime = WatchSettingsStore.use24HourTime(this)
+        val nowMillis = System.currentTimeMillis()
 
         val bgPaint = Paint().apply {
             color = Color.BLACK
@@ -539,6 +541,9 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 if (!showRecurringLabels && event.isDailyRepeated) {
                     continue
                 }
+                if (hidePastEventLabels && event.endMillis <= nowMillis) {
+                    continue
+                }
 
                 val label = fitLabelToWidth(title, labelPaint, maxLabelWidth)
                 if (label.isBlank()) {
@@ -638,9 +643,8 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 canvas.restore()
             }
 
-            val now = System.currentTimeMillis()
             if (dayDuration > 0L) {
-                val nowFraction = ((now - probe.dayStartMillis).toDouble() / dayDuration.toDouble())
+                val nowFraction = ((nowMillis - probe.dayStartMillis).toDouble() / dayDuration.toDouble())
                     .toFloat()
                     .coerceIn(0f, 1f)
                 val passedSweepDegrees = nowFraction * 360f

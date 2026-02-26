@@ -69,6 +69,9 @@ fun SettingsScreen() {
     var use24HourTime by remember {
         mutableStateOf(WatchSettingsStore.use24HourTime(context))
     }
+    var hidePastEventLabels by remember {
+        mutableStateOf(WatchSettingsStore.hidePastEventLabels(context))
+    }
 
     ScalingLazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -110,6 +113,20 @@ fun SettingsScreen() {
                 label = { Text(stringResource(R.string.settings_24_hour_title)) },
                 secondaryLabel = { Text(stringResource(R.string.settings_24_hour_subtitle)) },
                 toggleControl = { Switch(checked = use24HourTime) }
+            )
+        }
+        item {
+            ToggleChip(
+                modifier = Modifier.fillMaxWidth(),
+                checked = hidePastEventLabels,
+                onCheckedChange = { checked ->
+                    hidePastEventLabels = checked
+                    WatchSettingsStore.setHidePastEventLabels(context, checked)
+                    MainComplicationService.forceUpdateNow(context)
+                },
+                label = { Text(stringResource(R.string.settings_hide_past_labels_title)) },
+                secondaryLabel = { Text(stringResource(R.string.settings_hide_past_labels_subtitle)) },
+                toggleControl = { Switch(checked = hidePastEventLabels) }
             )
         }
     }
