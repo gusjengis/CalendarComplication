@@ -583,10 +583,22 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                         continue
                     }
 
-                    val activeEvents = clippedEvents
-                        .filter { it.startMillis < segmentEnd && it.endMillis > segmentStart }
+                    val overlappingEvents =
+                        clippedEvents.filter { it.startMillis < segmentEnd && it.endMillis > segmentStart }
+                    val containmentCountByEventIndex = overlappingEvents.associate { candidate ->
+                        val containingCount = overlappingEvents.count { other ->
+                            other.eventIndex != candidate.eventIndex &&
+                                other.startMillis <= candidate.startMillis &&
+                                other.endMillis >= candidate.endMillis
+                        }
+                        candidate.eventIndex to containingCount
+                    }
+                    val activeEvents = overlappingEvents
                         .sortedWith(
-                            compareBy<ClippedEvent> { it.startMillis }
+                            compareByDescending<ClippedEvent> {
+                                containmentCountByEventIndex[it.eventIndex] ?: 0
+                            }
+                                .thenBy { it.startMillis }
                                 .thenBy { it.endMillis }
                                 .thenBy { it.event.eventId }
                                 .thenBy { it.event.color }
