@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
+import android.database.ContentObserver
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -35,6 +36,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
         private const val TAG = "MainComplicationService"
         private const val IMAGE_SIZE = 450
         private const val TICK_MS = 60_000L
+        private const val CALENDAR_CHANGE_DEBOUNCE_MS = 350L
 
         private val WEARABLE_PROVIDER_BASE_URI: Uri =
             Uri.parse("content://com.google.android.wearable.provider.calendar")
@@ -51,6 +53,23 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
     private val activePhotoComplicationIds = Collections.synchronizedSet(mutableSetOf<Int>())
     private val mainHandler = Handler(Looper.getMainLooper())
     private var tickerRunning = false
+    private var calendarObserverRegistered = false
+
+    private val calendarChangeRefreshRunnable = Runnable {
+        if (activePhotoComplicationIds.isNotEmpty()) {
+            forceUpdateNow(this@MainComplicationService)
+        }
+    }
+
+    private val calendarObserver = object : ContentObserver(mainHandler) {
+        override fun onChange(selfChange: Boolean) {
+            onCalendarDataChanged()
+        }
+
+        override fun onChange(selfChange: Boolean, uri: Uri?) {
+            onCalendarDataChanged()
+        }
+    }
 
     private val minuteTicker = object : Runnable {
         override fun run() {
@@ -128,6 +147,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
         }
 
         tickerRunning = true
+        registerCalendarObserverIfNeeded()
         mainHandler.removeCallbacks(minuteTicker)
 
         val now = System.currentTimeMillis()
@@ -139,6 +159,43 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
     private fun stopTicker() {
         tickerRunning = false
         mainHandler.removeCallbacks(minuteTicker)
+        mainHandler.removeCallbacks(calendarChangeRefreshRunnable)
+        unregisterCalendarObserverIfNeeded()
+    }
+
+    private fun onCalendarDataChanged() {
+        if (activePhotoComplicationIds.isEmpty()) {
+            return
+        }
+        mainHandler.removeCallbacks(calendarChangeRefreshRunnable)
+        mainHandler.postDelayed(calendarChangeRefreshRunnable, CALENDAR_CHANGE_DEBOUNCE_MS)
+    }
+
+    private fun registerCalendarObserverIfNeeded() {
+        if (calendarObserverRegistered) {
+            return
+        }
+
+        runCatching {
+            contentResolver.registerContentObserver(WEARABLE_PROVIDER_BASE_URI, true, calendarObserver)
+        }.onSuccess {
+            calendarObserverRegistered = true
+        }.onFailure {
+            Log.w(TAG, "Failed to register calendar observer", it)
+        }
+    }
+
+    private fun unregisterCalendarObserverIfNeeded() {
+        if (!calendarObserverRegistered) {
+            return
+        }
+
+        runCatching {
+            contentResolver.unregisterContentObserver(calendarObserver)
+        }.onFailure {
+            Log.w(TAG, "Failed to unregister calendar observer", it)
+        }
+        calendarObserverRegistered = false
     }
 
     private fun probeCalendarDataAccess(): CalendarProbeResult {
@@ -215,6 +272,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
             val eventColorIndex = cursor.getColumnIndex("eventColor")
             val calendarColorIndex = cursor.getColumnIndex("calendar_color")
             val displayColorIndex = cursor.getColumnIndex("displayColor")
+            val titleIndex = cursor.getColumnIndex("title")
 
             while (cursor.moveToNext()) {
                 val start = normalizeEpochMillis(getLongCompat(cursor, startIndex))
@@ -232,6 +290,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                     CalendarEventStub(
                         startMillis = start,
                         endMillis = end,
+                        title = if (titleIndex >= 0) cursor.getString(titleIndex) else null,
                         color = resolveEventColor(
                             displayColor = getNullableColorCompat(cursor, displayColorIndex),
                             eventColor = getNullableColorCompat(cursor, eventColorIndex),
@@ -364,7 +423,37 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 strokeCap = Paint.Cap.BUTT
                 isAntiAlias = true
             }
+            val labelPaint = Paint().apply {
+                color = Color.rgb(230, 236, 246)
+                textSize = 20f
+                textAlign = Paint.Align.LEFT
+                isAntiAlias = true
+            }
+            val labelShadowPaint = Paint().apply {
+                color = Color.argb(150, 0, 0, 0)
+                textSize = 20f
+                textAlign = Paint.Align.LEFT
+                isAntiAlias = true
+            }
             val dayDuration = probe.dayEndMillis - probe.dayStartMillis
+            val labelRingPadding = 12f
+            val centerKeepoutRadius = 78f
+            val maxLabelWidth = (ringRadius - labelRingPadding - centerKeepoutRadius).coerceAtLeast(18f)
+            val anchorRadius = ringRadius
+
+            data class LabelCandidate(
+                val label: String,
+                val anchorX: Float,
+                val anchorY: Float,
+                val rotation: Float,
+                val textStartX: Float,
+                val textBaselineY: Float,
+                val centerX: Float,
+                val centerY: Float,
+                val priority: Float
+            )
+
+            val labelCandidates = mutableListOf<LabelCandidate>()
 
             for (event in probe.dayEvents) {
                 val clippedStart = maxOf(event.startMillis, probe.dayStartMillis)
@@ -383,6 +472,82 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
 
                 arcPaint.color = event.color
                 canvas.drawArc(ringRect, startDegrees, sweepDegrees, false, arcPaint)
+
+                val title = event.title?.trim().orEmpty()
+                if (title.isBlank()) {
+                    continue
+                }
+
+                val label = fitLabelToWidth(title, labelPaint, maxLabelWidth)
+                if (label.isBlank()) {
+                    continue
+                }
+                val textWidth = labelPaint.measureText(label)
+
+                val midDegrees = startDegrees + (sweepDegrees / 2f)
+                val midRadians = Math.toRadians(midDegrees.toDouble())
+                val anchorX = center + (cos(midRadians) * anchorRadius).toFloat()
+                val anchorY = center + (sin(midRadians) * anchorRadius).toFloat()
+
+                val normalizedAngle = ((midDegrees % 360f) + 360f) % 360f
+                val isFlippedForReadability = normalizedAngle > 90f && normalizedAngle < 270f
+                val labelRotation = if (isFlippedForReadability) {
+                    normalizedAngle + 180f
+                } else {
+                    normalizedAngle
+                }
+
+                val textStartX = if (isFlippedForReadability) {
+                    labelRingPadding
+                } else {
+                    -(textWidth + labelRingPadding)
+                }
+                val textCenterOffset = textStartX + (textWidth / 2f)
+                val rotationRadians = Math.toRadians(labelRotation.toDouble())
+                val textCenterX = anchorX + (cos(rotationRadians) * textCenterOffset).toFloat()
+                val textCenterY = anchorY + (sin(rotationRadians) * textCenterOffset).toFloat()
+                val textBaselineY = -((labelPaint.fontMetrics.ascent + labelPaint.fontMetrics.descent) / 2f)
+
+                labelCandidates.add(
+                    LabelCandidate(
+                        label = label,
+                        anchorX = anchorX,
+                        anchorY = anchorY,
+                        rotation = labelRotation,
+                        textStartX = textStartX,
+                        textBaselineY = textBaselineY,
+                        centerX = textCenterX,
+                        centerY = textCenterY,
+                        priority = sweepDegrees
+                    )
+                )
+            }
+
+            val placedLabelCenters = mutableListOf<Pair<Float, Float>>()
+            for (candidate in labelCandidates.sortedByDescending { it.priority }) {
+                val minDistance = 28f
+                val minDistanceSq = minDistance * minDistance
+                val overlapsExisting = placedLabelCenters.any { (x, y) ->
+                    val dx = candidate.centerX - x
+                    val dy = candidate.centerY - y
+                    (dx * dx) + (dy * dy) < minDistanceSq
+                }
+                if (overlapsExisting) {
+                    continue
+                }
+
+                placedLabelCenters.add(candidate.centerX to candidate.centerY)
+                canvas.save()
+                canvas.translate(candidate.anchorX, candidate.anchorY)
+                canvas.rotate(candidate.rotation)
+                canvas.drawText(
+                    candidate.label,
+                    candidate.textStartX + 1f,
+                    candidate.textBaselineY + 1f,
+                    labelShadowPaint
+                )
+                canvas.drawText(candidate.label, candidate.textStartX, candidate.textBaselineY, labelPaint)
+                canvas.restore()
             }
 
             val now = System.currentTimeMillis()
@@ -471,6 +636,7 @@ private data class CalendarProbeResult(
 private data class CalendarEventStub(
     val startMillis: Long,
     val endMillis: Long,
+    val title: String?,
     val color: Int
 )
 
@@ -484,3 +650,24 @@ private data class DayBounds(
     val startMillis: Long,
     val endMillis: Long
 )
+
+private fun fitLabelToWidth(title: String, paint: Paint, maxWidthPx: Float): String {
+    val trimmed = title.trim()
+    if (trimmed.isBlank()) {
+        return ""
+    }
+    if (paint.measureText(trimmed) <= maxWidthPx) {
+        return trimmed
+    }
+
+    val ellipsis = "..."
+    var end = trimmed.length
+    while (end > 1) {
+        val candidate = trimmed.substring(0, end).trimEnd() + ellipsis
+        if (paint.measureText(candidate) <= maxWidthPx) {
+            return candidate
+        }
+        end -= 1
+    }
+    return ""
+}
