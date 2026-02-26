@@ -28,7 +28,7 @@
                 android:value="LARGE_IMAGE" />
             <meta-data
                 android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS"
-                android:value="0" />
+                android:value="60" />
         </service>
         <service
             android:name=".tile.MainTileService"
@@ -43,6 +43,10 @@
                 android:name="androidx.wear.tiles.PREVIEW"
                 android:resource="@drawable/tile_preview" />
         </service>
+
+        <receiver
+            android:name=".complication.ComplicationWatchdogReceiver"
+            android:exported="false" />
 
         <uses-library
             android:name="com.google.android.wearable"

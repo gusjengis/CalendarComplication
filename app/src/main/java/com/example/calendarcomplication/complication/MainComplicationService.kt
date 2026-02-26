@@ -75,7 +75,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
 
     private val minuteTicker = object : Runnable {
         override fun run() {
-            if (!tickerRunning) {
+            if (!tickerRunning || activePhotoComplicationIds.isEmpty()) {
                 return
             }
 
@@ -111,7 +111,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
         }
 
         activePhotoComplicationIds.add(request.complicationInstanceId)
-        startTickerIfNeeded()
+        startRefreshLoopIfNeeded()
 
         val probe = probeCalendarDataAccess()
         Log.d(TAG, "Calendar probe: ${probe.status} (${probe.detail})")
@@ -126,7 +126,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
         super.onComplicationActivated(complicationInstanceId, type)
         if (type == ComplicationType.PHOTO_IMAGE) {
             activePhotoComplicationIds.add(complicationInstanceId)
-            startTickerIfNeeded()
+            startRefreshLoopIfNeeded()
         }
     }
 
@@ -134,34 +134,36 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
         super.onComplicationDeactivated(complicationInstanceId)
         activePhotoComplicationIds.remove(complicationInstanceId)
         if (activePhotoComplicationIds.isEmpty()) {
-            stopTicker()
+            stopRefreshLoop()
         }
     }
 
     override fun onDestroy() {
-        stopTicker()
+        stopRefreshLoop()
         super.onDestroy()
     }
 
-    private fun startTickerIfNeeded() {
+    private fun startRefreshLoopIfNeeded() {
         if (tickerRunning || activePhotoComplicationIds.isEmpty()) {
             return
         }
 
         tickerRunning = true
         registerCalendarObserverIfNeeded()
-        mainHandler.removeCallbacks(minuteTicker)
+        ComplicationWatchdogScheduler.start(this)
 
+        mainHandler.removeCallbacks(minuteTicker)
+        forceUpdateNow(this)
         val now = System.currentTimeMillis()
         val firstDelay = TICK_MS - (now % TICK_MS)
-        forceUpdateNow(this)
         mainHandler.postDelayed(minuteTicker, firstDelay)
     }
 
-    private fun stopTicker() {
+    private fun stopRefreshLoop() {
         tickerRunning = false
         mainHandler.removeCallbacks(minuteTicker)
         mainHandler.removeCallbacks(calendarChangeRefreshRunnable)
+        ComplicationWatchdogScheduler.stop(this)
         unregisterCalendarObserverIfNeeded()
     }
 
