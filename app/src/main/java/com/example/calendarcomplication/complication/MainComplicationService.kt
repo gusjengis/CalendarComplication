@@ -25,6 +25,7 @@ import androidx.wear.watchface.complications.data.PlainComplicationText
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
+import com.example.calendarcomplication.settings.WatchSettingsStore
 import java.util.Collections
 import java.util.Locale
 import kotlin.math.abs
@@ -213,22 +214,32 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
             val now = System.currentTimeMillis()
             val dayBounds = localDayBounds(now)
             val dayEnd = now + 24L * 60L * 60L * 1000L
-            val weekEnd = now + 7L * 24L * 60L * 60L * 1000L
+            val dayMillis = dayBounds.endMillis - dayBounds.startMillis
+            val yesterdayStart = dayBounds.startMillis - dayMillis
+            val tomorrowEnd = dayBounds.endMillis + dayMillis
 
-            val raw = loadWearableEventsRaw(now, weekEnd)
+            val raw = loadWearableEventsRaw(yesterdayStart, tomorrowEnd)
             val todayRaw = loadWearableEventsRaw(dayBounds.startMillis, dayBounds.endMillis)
             val events24h = raw.events.filter { overlapsRange(it, now, dayEnd) }
             val accountSummary = raw.accountHint?.takeIf { it.isNotBlank() } ?: "unavailable"
+            val repeatedDailyEventIds = findRepeatedEventIds(raw.events)
+            val todayEventsWithRecurrence = todayRaw.events.map { event ->
+                if (event.eventId in repeatedDailyEventIds) {
+                    event.copy(isDailyRepeated = true)
+                } else {
+                    event
+                }
+            }
 
             val detail =
-                "src:wearable 24h:${events24h.size}  7d:${raw.events.size}  raw:${raw.rawCount}"
+                "src:wearable 24h:${events24h.size}  3d:${raw.events.size}  raw:${raw.rawCount}"
 
             CalendarProbeResult(
                 status = "CALENDAR ACCESS OK",
                 detail = detail,
                 account = "Account: $accountSummary",
                 sync = "sync: wearable managed",
-                dayEvents = todayRaw.events,
+                dayEvents = todayEventsWithRecurrence,
                 dayStartMillis = dayBounds.startMillis,
                 dayEndMillis = dayBounds.endMillis
             )
@@ -266,7 +277,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
         )?.use { cursor ->
             rawCount = cursor.count
 
-            firstExistingColumnIndex(cursor, listOf("_id", "event_id"))
+            val eventIdIndex = firstExistingColumnIndex(cursor, listOf("event_id", "_id"))
             val startIndex = firstExistingColumnIndex(cursor, listOf("begin", "dtstart", "start", "startTime"))
             val endIndex = firstExistingColumnIndex(cursor, listOf("end", "dtend", "endTime"))
             val accountIndex = firstExistingColumnIndex(cursor, listOf("ownerAccount", "account_name", "organizer"))
@@ -289,9 +300,11 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
 
                 events.add(
                     CalendarEventStub(
+                        eventId = getLongCompat(cursor, eventIdIndex),
                         startMillis = start,
                         endMillis = end,
                         title = if (titleIndex >= 0) cursor.getString(titleIndex) else null,
+                        isDailyRepeated = false,
                         color = resolveEventColor(
                             displayColor = getNullableColorCompat(cursor, displayColorIndex),
                             eventColor = getNullableColorCompat(cursor, eventColorIndex),
@@ -375,6 +388,33 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
         return event.endMillis >= startMillis && event.startMillis <= endMillis
     }
 
+    private fun findRepeatedEventIds(events: List<CalendarEventStub>): Set<Long> {
+        val buckets = mutableMapOf<Long, MutableSet<Long>>()
+        for (event in events) {
+            if (event.eventId <= 0L) {
+                continue
+            }
+
+            val dayId = localDayId(event.startMillis)
+            buckets.getOrPut(event.eventId) { mutableSetOf() }.add(dayId)
+        }
+
+        return buckets
+            .filterValues { distinctDays -> distinctDays.size >= 2 }
+            .keys
+    }
+
+    private fun localDayId(epochMillis: Long): Long {
+        val calendar = java.util.Calendar.getInstance().apply {
+            timeInMillis = epochMillis
+            set(java.util.Calendar.HOUR_OF_DAY, 0)
+            set(java.util.Calendar.MINUTE, 0)
+            set(java.util.Calendar.SECOND, 0)
+            set(java.util.Calendar.MILLISECOND, 0)
+        }
+        return calendar.timeInMillis
+    }
+
     private fun localDayBounds(nowMillis: Long): DayBounds {
         val calendar = java.util.Calendar.getInstance().apply {
             timeInMillis = nowMillis
@@ -394,6 +434,8 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
         val canvas = Canvas(bitmap)
         val sizeF = IMAGE_SIZE.toFloat()
         val center = sizeF / 2f
+        val showRecurringLabels = WatchSettingsStore.shouldShowRecurringLabels(this)
+        val use24HourTime = WatchSettingsStore.use24HourTime(this)
 
         val bgPaint = Paint().apply {
             color = Color.BLACK
@@ -492,6 +534,9 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
 
                 val title = event.title?.trim().orEmpty()
                 if (title.isBlank()) {
+                    continue
+                }
+                if (!showRecurringLabels && event.isDailyRepeated) {
                     continue
                 }
 
@@ -633,11 +678,19 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
         }
 
         val nowCal = java.util.Calendar.getInstance()
-        val hour12Raw = nowCal.get(java.util.Calendar.HOUR)
-        val hour12 = if (hour12Raw == 0) 12 else hour12Raw
         val minute = nowCal.get(java.util.Calendar.MINUTE)
-        val amPm = if (nowCal.get(java.util.Calendar.AM_PM) == java.util.Calendar.AM) "AM" else "PM"
-        val timeText = String.format(Locale.getDefault(), "%d:%02d", hour12, minute)
+        val timeText: String
+        val amPmText: String?
+        if (use24HourTime) {
+            val hour24 = nowCal.get(java.util.Calendar.HOUR_OF_DAY)
+            timeText = String.format(Locale.getDefault(), "%02d:%02d", hour24, minute)
+            amPmText = null
+        } else {
+            val hour12Raw = nowCal.get(java.util.Calendar.HOUR)
+            val hour12 = if (hour12Raw == 0) 12 else hour12Raw
+            timeText = String.format(Locale.getDefault(), "%d:%02d", hour12, minute)
+            amPmText = if (nowCal.get(java.util.Calendar.AM_PM) == java.util.Calendar.AM) "AM" else "PM"
+        }
 
         val timeShadowPaint = Paint().apply {
             color = Color.argb(170, 0, 0, 0)
@@ -660,7 +713,9 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
 
         canvas.drawText(timeText, center + 1f, center + 16f, timeShadowPaint)
         canvas.drawText(timeText, center, center + 15f, timePaint)
-        canvas.drawText(amPm, center, center + 35f, amPmPaint)
+        if (amPmText != null) {
+            canvas.drawText(amPmText, center, center + 35f, amPmPaint)
+        }
 
         return bitmap
     }
@@ -677,9 +732,11 @@ private data class CalendarProbeResult(
 )
 
 private data class CalendarEventStub(
+    val eventId: Long,
     val startMillis: Long,
     val endMillis: Long,
     val title: String?,
+    val isDailyRepeated: Boolean,
     val color: Int
 )
 
