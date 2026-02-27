@@ -10,6 +10,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.Icon
 import android.net.Uri
@@ -495,8 +496,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 val rotation: Float,
                 val textStartX: Float,
                 val textBaselineY: Float,
-                val centerX: Float,
-                val centerY: Float
+                val collisionQuad: FloatArray
             )
 
             data class RenderedSegment(
@@ -947,6 +947,9 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                     continue
                 }
                 val textWidth = labelPaint.measureText(label)
+                val glyphBounds = Rect().apply {
+                    labelPaint.getTextBounds(label, 0, label.length, this)
+                }
 
                 val eventMidMillis = clippedEvent.startMillis + ((clippedEvent.endMillis - clippedEvent.startMillis) / 2L)
                 val spanCandidates = eventSpansByIndex[clippedEvent.eventIndex]
@@ -994,11 +997,38 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                     } else {
                         -(textWidth + labelRingPadding)
                     }
-                    val textCenterOffset = textStartX + (textWidth / 2f)
                     val rotationRadians = Math.toRadians(labelRotation.toDouble())
-                    val textCenterX = anchorX + (cos(rotationRadians) * textCenterOffset).toFloat()
-                    val textCenterY = anchorY + (sin(rotationRadians) * textCenterOffset).toFloat()
-                    val textBaselineY = -((labelPaint.fontMetrics.ascent + labelPaint.fontMetrics.descent) / 2f)
+                    val fontMetrics = labelPaint.fontMetrics
+                    val textBaselineY = -((fontMetrics.ascent + fontMetrics.descent) / 2f)
+
+                    val collisionPadding = 0.5f
+                    val localLeft = textStartX + glyphBounds.left - collisionPadding
+                    val localRight = textStartX + glyphBounds.right + collisionPadding
+                    val localTop = textBaselineY + glyphBounds.top - collisionPadding
+                    val localBottom = textBaselineY + glyphBounds.bottom + collisionPadding
+                    val rotationCos = cos(rotationRadians).toFloat()
+                    val rotationSin = sin(rotationRadians).toFloat()
+
+                    fun worldPoint(localX: Float, localY: Float): Pair<Float, Float> {
+                        val worldX = anchorX + (localX * rotationCos) - (localY * rotationSin)
+                        val worldY = anchorY + (localX * rotationSin) + (localY * rotationCos)
+                        return worldX to worldY
+                    }
+
+                    val topLeft = worldPoint(localLeft, localTop)
+                    val topRight = worldPoint(localRight, localTop)
+                    val bottomRight = worldPoint(localRight, localBottom)
+                    val bottomLeft = worldPoint(localLeft, localBottom)
+                    val collisionQuad = floatArrayOf(
+                        topLeft.first,
+                        topLeft.second,
+                        topRight.first,
+                        topRight.second,
+                        bottomRight.first,
+                        bottomRight.second,
+                        bottomLeft.first,
+                        bottomLeft.second
+                    )
 
                     labelCandidatesForEvent.add(
                         LabelCandidate(
@@ -1008,8 +1038,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                             rotation = labelRotation,
                             textStartX = textStartX,
                             textBaselineY = textBaselineY,
-                            centerX = textCenterX,
-                            centerY = textCenterY
+                            collisionQuad = collisionQuad
                         )
                     )
                 }
@@ -1053,37 +1082,108 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 canvas.drawLine(x1, y1, x2, y2, separatorPaint)
             }
 
-            val placedLabelCenters = mutableListOf<Pair<Float, Float>>()
-            for (eventPlan in eventLabelPlans.sortedWith(
-                compareBy<EventLabelPlan> { it.isDailyRepeated }
-                    .thenByDescending { it.eventPriority }
-            )) {
-                for (candidate in eventPlan.candidates) {
-                    val minDistance = 28f
-                    val minDistanceSq = minDistance * minDistance
-                    val overlapsExisting = placedLabelCenters.any { (x, y) ->
-                        val dx = candidate.centerX - x
-                        val dy = candidate.centerY - y
-                        (dx * dx) + (dy * dy) < minDistanceSq
+            fun projectQuadOnAxis(quad: FloatArray, axisX: Float, axisY: Float): Pair<Float, Float> {
+                val firstProjection = (quad[0] * axisX) + (quad[1] * axisY)
+                var minProjection = firstProjection
+                var maxProjection = firstProjection
+                var index = 2
+                while (index < quad.size) {
+                    val projection = (quad[index] * axisX) + (quad[index + 1] * axisY)
+                    if (projection < minProjection) {
+                        minProjection = projection
                     }
-                    if (overlapsExisting) {
-                        continue
+                    if (projection > maxProjection) {
+                        maxProjection = projection
                     }
-
-                    placedLabelCenters.add(candidate.centerX to candidate.centerY)
-                    canvas.save()
-                    canvas.translate(candidate.anchorX, candidate.anchorY)
-                    canvas.rotate(candidate.rotation)
-                    canvas.drawText(
-                        candidate.label,
-                        candidate.textStartX + 1f,
-                        candidate.textBaselineY + 1f,
-                        labelShadowPaint
-                    )
-                    canvas.drawText(candidate.label, candidate.textStartX, candidate.textBaselineY, labelPaint)
-                    canvas.restore()
-                    break
+                    index += 2
                 }
+                return minProjection to maxProjection
+            }
+
+            fun quadsOverlap(quadA: FloatArray, quadB: FloatArray): Boolean {
+                fun separatedByAnyAxis(fromQuad: FloatArray): Boolean {
+                    val separationEpsilon = 1.0f
+                    var i = 0
+                    while (i < fromQuad.size) {
+                        val next = (i + 2) % fromQuad.size
+                        val edgeX = fromQuad[next] - fromQuad[i]
+                        val edgeY = fromQuad[next + 1] - fromQuad[i + 1]
+                        val axisX = -edgeY
+                        val axisY = edgeX
+
+                        val projA = projectQuadOnAxis(quadA, axisX, axisY)
+                        val projB = projectQuadOnAxis(quadB, axisX, axisY)
+                        if (projA.second <= projB.first + separationEpsilon ||
+                            projB.second <= projA.first + separationEpsilon
+                        ) {
+                            return true
+                        }
+                        i += 2
+                    }
+                    return false
+                }
+
+                if (separatedByAnyAxis(quadA)) {
+                    return false
+                }
+                if (separatedByAnyAxis(quadB)) {
+                    return false
+                }
+                return true
+            }
+
+            val placedLabelQuads = mutableListOf<FloatArray>()
+            data class PlacedLabel(
+                val candidate: LabelCandidate,
+                val isDailyRepeated: Boolean
+            )
+            val placedLabels = mutableListOf<PlacedLabel>()
+
+            fun placeLabelPlans(plans: List<EventLabelPlan>) {
+                for (eventPlan in plans) {
+                    for (candidate in eventPlan.candidates) {
+                        val overlapsExisting = placedLabelQuads.any { existingQuad ->
+                            quadsOverlap(candidate.collisionQuad, existingQuad)
+                        }
+                        if (overlapsExisting) {
+                            continue
+                        }
+
+                        placedLabelQuads.add(candidate.collisionQuad)
+                        placedLabels.add(
+                            PlacedLabel(
+                                candidate = candidate,
+                                isDailyRepeated = eventPlan.isDailyRepeated
+                            )
+                        )
+                        break
+                    }
+                }
+            }
+
+            val nonDailyPlans = eventLabelPlans
+                .filter { !it.isDailyRepeated }
+                .sortedByDescending { it.eventPriority }
+            val dailyPlans = eventLabelPlans
+                .filter { it.isDailyRepeated }
+                .sortedByDescending { it.eventPriority }
+
+            placeLabelPlans(nonDailyPlans)
+            placeLabelPlans(dailyPlans)
+
+            for (placed in placedLabels.sortedByDescending { it.isDailyRepeated }) {
+                val candidate = placed.candidate
+                canvas.save()
+                canvas.translate(candidate.anchorX, candidate.anchorY)
+                canvas.rotate(candidate.rotation)
+                canvas.drawText(
+                    candidate.label,
+                    candidate.textStartX + 1f,
+                    candidate.textBaselineY + 1f,
+                    labelShadowPaint
+                )
+                canvas.drawText(candidate.label, candidate.textStartX, candidate.textBaselineY, labelPaint)
+                canvas.restore()
             }
 
             if (dayDuration > 0L) {
