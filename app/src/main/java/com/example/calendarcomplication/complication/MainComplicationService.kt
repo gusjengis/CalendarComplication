@@ -500,6 +500,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
             )
 
             data class RenderedSegment(
+                val eventIndex: Int,
                 val startMillis: Long,
                 val endMillis: Long,
                 val startDegrees: Float,
@@ -568,12 +569,92 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                 )
                 renderedSegments.add(
                     RenderedSegment(
+                        eventIndex = clippedEvents.lastIndex,
                         startMillis = clippedStart,
                         endMillis = clippedEnd,
                         startDegrees = startDegrees,
                         color = event.color
                     )
                 )
+            }
+
+            val resolvedColorByEventIndex = mutableMapOf<Int, Int>()
+            if (clippedEvents.isNotEmpty()) {
+                val neighborToleranceMs = 60_000L
+                val groupedByBaseColor = clippedEvents.groupBy { it.event.color }
+
+                fun colorsForBase(baseColor: Int): List<Int> {
+                    val hsv = FloatArray(3)
+                    Color.colorToHSV(baseColor, hsv)
+                    val satBase = hsv[1]
+                    val valueBase = hsv[2]
+
+                    data class Offset(val satDelta: Float, val valueDelta: Float)
+                    val offsets = listOf(
+                        Offset(0f, 0f),
+                        Offset(0.16f, -0.24f),
+                        Offset(-0.14f, 0.22f),
+                        Offset(0.22f, -0.36f),
+                        Offset(-0.2f, 0.34f),
+                        Offset(0.08f, -0.14f),
+                        Offset(-0.08f, 0.14f)
+                    )
+
+                    return offsets.map { offset ->
+                        val variantHsv = floatArrayOf(
+                            hsv[0],
+                            (satBase + offset.satDelta).coerceIn(0.28f, 1f),
+                            (valueBase + offset.valueDelta).coerceIn(0.18f, 1f)
+                        )
+                        Color.HSVToColor(variantHsv)
+                    }
+                }
+
+                for ((baseColor, groupEvents) in groupedByBaseColor) {
+                    val eventIndexes = groupEvents.map { it.eventIndex }
+                    val neighbors = eventIndexes.associateWith { mutableSetOf<Int>() }
+
+                    for (i in 0 until groupEvents.size) {
+                        val first = groupEvents[i]
+                        for (j in i + 1 until groupEvents.size) {
+                            val second = groupEvents[j]
+                            val overlaps = first.startMillis < second.endMillis &&
+                                second.startMillis < first.endMillis
+                            val touches = abs(first.endMillis - second.startMillis) <= neighborToleranceMs ||
+                                abs(second.endMillis - first.startMillis) <= neighborToleranceMs
+                            if (overlaps || touches) {
+                                neighbors[first.eventIndex]?.add(second.eventIndex)
+                                neighbors[second.eventIndex]?.add(first.eventIndex)
+                            }
+                        }
+                    }
+
+                    val variants = colorsForBase(baseColor)
+                    val chosenVariantByEvent = mutableMapOf<Int, Int>()
+                    val orderedEventIndexes = groupEvents
+                        .sortedWith(
+                            compareByDescending<ClippedEvent> { neighbors[it.eventIndex]?.size ?: 0 }
+                                .thenBy { it.startMillis }
+                                .thenBy { it.endMillis }
+                                .thenBy { it.event.eventId }
+                        )
+                        .map { it.eventIndex }
+
+                    for (eventIndex in orderedEventIndexes) {
+                        val usedByNeighbors = neighbors[eventIndex]
+                            .orEmpty()
+                            .mapNotNull { chosenVariantByEvent[it] }
+                            .toSet()
+
+                        val preferredVariant = variants.indices.firstOrNull { it !in usedByNeighbors }
+                        val chosenVariant = preferredVariant ?: ((eventIndex % variants.size) + variants.size) % variants.size
+                        chosenVariantByEvent[eventIndex] = chosenVariant
+                    }
+
+                    for ((eventIndex, variantIndex) in chosenVariantByEvent) {
+                        resolvedColorByEventIndex[eventIndex] = variants[variantIndex]
+                    }
+                }
             }
 
             if (clippedEvents.isNotEmpty()) {
@@ -644,7 +725,8 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                     val segment = timelineSegments[segmentIndex]
                     if (segment.activeEvents.size <= 1) {
                         val singleEvent = segment.activeEvents.first()
-                        arcPaint.color = singleEvent.event.color
+                        arcPaint.color =
+                            resolvedColorByEventIndex[singleEvent.eventIndex] ?: singleEvent.event.color
                         arcPaint.strokeWidth = ringStrokeWidth
                         canvas.drawArc(
                             ringRect,
@@ -823,7 +905,8 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
                                     center + runRadius
                                 )
 
-                                arcPaint.color = event.event.color
+                                arcPaint.color =
+                                    resolvedColorByEventIndex[event.eventIndex] ?: event.event.color
                                 arcPaint.strokeWidth = runOuter - runInner
                                 canvas.drawArc(
                                     runRect,
@@ -954,7 +1037,9 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
             for (i in 1 until renderedSegments.size) {
                 val previous = renderedSegments[i - 1]
                 val current = renderedSegments[i]
-                val isSameColor = previous.color == current.color
+                val previousColor = resolvedColorByEventIndex[previous.eventIndex] ?: previous.color
+                val currentColor = resolvedColorByEventIndex[current.eventIndex] ?: current.color
+                val isSameColor = previousColor == currentColor
                 val isAdjacentInTime = abs(current.startMillis - previous.endMillis) <= 60_000L
                 if (!isSameColor || !isAdjacentInTime) {
                     continue
