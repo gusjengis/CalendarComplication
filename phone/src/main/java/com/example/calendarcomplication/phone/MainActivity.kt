@@ -2,8 +2,13 @@ package com.example.calendarcomplication.phone
 
 import android.Manifest
 import android.app.Activity
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
+import androidx.core.content.ContextCompat
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
@@ -14,6 +19,7 @@ import com.example.calendarcomplication.core.render.CalendarRenderEvent
 import com.example.calendarcomplication.core.render.CalendarRenderProbe
 import com.example.calendarcomplication.core.settings.CalendarSettings
 import com.example.calendarcomplication.core.settings.CalendarSettingsStore
+import com.example.calendarcomplication.core.sync.SettingsSyncContract
 import com.example.calendarcomplication.phone.sync.CalendarSyncScheduler
 import com.example.calendarcomplication.phone.sync.CalendarSyncTransmitter
 import com.example.calendarcomplication.phone.sync.SettingsSyncTransmitter
@@ -33,6 +39,19 @@ class MainActivity : Activity() {
         use24HourTime = false,
         hidePastEventLabels = true
     )
+
+    private val settingsUpdatedReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action != SettingsSyncContract.ACTION_SETTINGS_UPDATED) {
+                return
+            }
+            settings = CalendarSettingsStore.load(this@MainActivity)
+            bindSettingsUi()
+            if (checkSelfPermission(Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
+                refreshPreview()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,11 +121,22 @@ class MainActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
+        ContextCompat.registerReceiver(
+            this,
+            settingsUpdatedReceiver,
+            IntentFilter(SettingsSyncContract.ACTION_SETTINGS_UPDATED),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
         settings = CalendarSettingsStore.load(this)
         bindSettingsUi()
         if (checkSelfPermission(Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
             refreshPreview()
         }
+    }
+
+    override fun onPause() {
+        unregisterReceiver(settingsUpdatedReceiver)
+        super.onPause()
     }
 
     override fun onRequestPermissionsResult(

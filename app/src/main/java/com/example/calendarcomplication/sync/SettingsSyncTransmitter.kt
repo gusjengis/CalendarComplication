@@ -1,13 +1,15 @@
 package com.example.calendarcomplication.sync
 
 import android.content.Context
+import android.util.Log
 import com.example.calendarcomplication.core.settings.CalendarSettings
 import com.example.calendarcomplication.core.sync.SettingsSyncContract
-import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
 
 object SettingsSyncTransmitter {
+    private const val TAG = "SettingsSyncTx"
+
     fun push(
         context: Context,
         settings: CalendarSettings,
@@ -23,7 +25,9 @@ object SettingsSyncTransmitter {
                 dataMap.putString(SettingsSyncContract.KEY_SOURCE, source)
             }.asPutDataRequest().setUrgent()
 
-            Tasks.await(Wearable.getDataClient(context).putDataItem(request))
+            Wearable.getDataClient(context)
+                .putDataItem(request)
+                .addOnFailureListener { e -> Log.w(TAG, "Failed to push settings", e) }
             true
         }.getOrDefault(false)
     }

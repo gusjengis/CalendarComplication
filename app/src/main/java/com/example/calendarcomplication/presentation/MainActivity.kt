@@ -6,12 +6,17 @@
 package com.example.calendarcomplication.presentation
 
 import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.DisposableEffect
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.content.ContextCompat
 import androidx.compose.foundation.layout.PaddingValues
@@ -53,6 +58,7 @@ import com.example.calendarcomplication.R
 import com.example.calendarcomplication.complication.MainComplicationService
 import com.example.calendarcomplication.presentation.theme.CalendarComplicationTheme
 import com.example.calendarcomplication.core.settings.CalendarSettingsStore
+import com.example.calendarcomplication.core.sync.SettingsSyncContract
 import com.example.calendarcomplication.sync.SettingsSyncTransmitter
 import kotlinx.coroutines.launch
 
@@ -110,6 +116,26 @@ fun SettingsScreen() {
     val focusRequester = remember { FocusRequester() }
     val coroutineScope = rememberCoroutineScope()
     var settings by remember { mutableStateOf(CalendarSettingsStore.load(context)) }
+
+    DisposableEffect(context) {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(receiverContext: Context?, intent: Intent?) {
+                if (intent?.action != SettingsSyncContract.ACTION_SETTINGS_UPDATED) {
+                    return
+                }
+                settings = CalendarSettingsStore.load(context)
+            }
+        }
+        ContextCompat.registerReceiver(
+            context,
+            receiver,
+            IntentFilter(SettingsSyncContract.ACTION_SETTINGS_UPDATED),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+        onDispose {
+            context.unregisterReceiver(receiver)
+        }
+    }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()

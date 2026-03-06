@@ -1,5 +1,6 @@
 package com.example.calendarcomplication.phone.sync
 
+import android.content.Intent
 import com.example.calendarcomplication.core.settings.CalendarSettings
 import com.example.calendarcomplication.core.settings.CalendarSettingsStore
 import com.example.calendarcomplication.core.sync.SettingsSyncContract
@@ -30,10 +31,10 @@ class SettingsSyncListenerService : WearableListenerService() {
                     use24HourTime = map.getBoolean(SettingsSyncContract.KEY_USE_24_HOUR_TIME),
                     hidePastEventLabels = map.getBoolean(SettingsSyncContract.KEY_HIDE_PAST_EVENT_LABELS)
                 )
-                CalendarSettingsStore.saveIfNewer(
-                    this,
-                    settings,
-                    map.getLong(SettingsSyncContract.KEY_UPDATED_AT)
+                CalendarSettingsStore.save(this, settings, map.getLong(SettingsSyncContract.KEY_UPDATED_AT))
+                sendBroadcast(
+                    Intent(SettingsSyncContract.ACTION_SETTINGS_UPDATED)
+                        .setPackage(packageName)
                 )
             }
         }
