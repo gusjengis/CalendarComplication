@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.example.calendarcomplication.phone-mergeDebugResources-24:/values-v23/values-v23.xml",
+            "map": [
+                {
+                    "source": "/home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/res/values-v23/values-v23.xml",
+                    "from": {
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,121",
+                        "endColumns": "65,62",
+                        "endOffsets": "116,179"
+                    }
+                }
+            ]
+        }
+    ]
+}

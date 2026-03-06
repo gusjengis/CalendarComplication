@@ -27,6 +27,7 @@ import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUp
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.example.calendarcomplication.settings.WatchSettingsStore
+import com.example.calendarcomplication.sync.PhoneCalendarSyncStore
 import java.util.Collections
 import java.util.Locale
 import kotlin.math.abs
@@ -204,10 +205,42 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
     }
 
     private fun probeCalendarDataAccess(): CalendarProbeResult {
+        val syncedSnapshot = PhoneCalendarSyncStore.load(this)
+        if (syncedSnapshot != null) {
+            val now = System.currentTimeMillis()
+            val dayBounds = localDayBounds(now)
+            val dayEnd = now + 24L * 60L * 60L * 1000L
+            val dayMillis = dayBounds.endMillis - dayBounds.startMillis
+            val yesterdayStart = dayBounds.startMillis - dayMillis
+            val tomorrowEnd = dayBounds.endMillis + dayMillis
+            val syncedEvents = syncedSnapshot.events.filter { overlapsRange(it, yesterdayStart, tomorrowEnd) }
+            val events24h = syncedEvents.filter { overlapsRange(it, now, dayEnd) }
+            val repeatedDailyEventIds = findRepeatedEventIds(syncedEvents)
+            val todayEventsWithRecurrence = syncedEvents
+                .filter { overlapsRange(it, dayBounds.startMillis, dayBounds.endMillis) }
+                .map { event ->
+                    if (event.eventId in repeatedDailyEventIds) {
+                        event.copy(isDailyRepeated = true)
+                    } else {
+                        event
+                    }
+                }
+
+            return CalendarProbeResult(
+                status = "PHONE SYNC OK",
+                detail = "src:phone 24h:${events24h.size}  3d:${syncedEvents.size}  raw:${syncedSnapshot.events.size}",
+                account = "Account: ${syncedSnapshot.accountHint}",
+                sync = "sync: companion ${formatAgeMinutes(now - syncedSnapshot.updatedAtMillis)}",
+                dayEvents = todayEventsWithRecurrence,
+                dayStartMillis = dayBounds.startMillis,
+                dayEndMillis = dayBounds.endMillis
+            )
+        }
+
         if (!hasCalendarPermission()) {
             return CalendarProbeResult(
                 status = "NO CALENDAR PERMISSION",
-                detail = "Grant READ_CALENDAR to provider app",
+                detail = "Grant READ_CALENDAR or install companion",
                 account = "Account: unavailable",
                 sync = "sync: wearable managed"
             )
@@ -264,6 +297,14 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
             this,
             Manifest.permission.READ_CALENDAR
         ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun formatAgeMinutes(ageMillis: Long): String {
+        if (ageMillis <= 0L) {
+            return "just now"
+        }
+        val minutes = ageMillis / 60_000L
+        return if (minutes <= 0L) "just now" else "${minutes}m ago"
     }
 
     private fun loadWearableEventsRaw(startMillis: Long, endMillis: Long): WearableEventsRaw {
@@ -1278,7 +1319,7 @@ private data class CalendarProbeResult(
     val dayEndMillis: Long = 0L
 )
 
-private data class CalendarEventStub(
+data class CalendarEventStub(
     val eventId: Long,
     val startMillis: Long,
     val endMillis: Long,

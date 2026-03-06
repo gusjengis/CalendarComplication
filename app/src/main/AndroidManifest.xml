@@ -48,6 +48,14 @@
             android:name=".complication.ComplicationWatchdogReceiver"
             android:exported="false" />
 
+        <service
+            android:name=".sync.PhoneCalendarSyncListenerService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
+            </intent-filter>
+        </service>
+
         <uses-library
             android:name="com.google.android.wearable"
             android:required="true" />

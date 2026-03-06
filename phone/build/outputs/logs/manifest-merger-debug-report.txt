@@ -1,0 +1,511 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:2:1-32:12
+INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:2:1-32:12
+INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:2:1-32:12
+INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:2:1-32:12
+MERGED from [com.google.android.gms:play-services-wearable:19.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7eb91a20ad4a217a6b3ad458a1205449/transformed/play-services-wearable-19.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.android.gms:play-services-base:18.5.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/fb669f41c9e7a525f337c6733c90df90/transformed/play-services-base-18.5.0/AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/040302df573dc77d5928d7efbe4728e0/transformed/play-services-tasks-18.2.0/AndroidManifest.xml:2:1-5:12
+MERGED from [com.google.android.gms:play-services-basement:18.4.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/8fa6f5fc4fa48e2f7b7dfe2d99315e1a/transformed/play-services-basement-18.4.0/AndroidManifest.xml:2:1-9:12
+MERGED from [androidx.work:work-runtime-ktx:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/41f442b39a1e15f53e5efe23aab06d7e/transformed/work-runtime-ktx-2.10.4/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:17:1-145:12
+MERGED from [androidx.fragment:fragment:1.1.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/735980ecba72aac7b37b716993588c0b/transformed/fragment-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/c462427b26f3e41da19a1c16f8066be9/transformed/viewpager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.loader:loader:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/46a32b986b620c7862260beaa7893ef0/transformed/loader-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.activity:activity:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/d9d1bf5dac2b9a3bc91c35b411f7efe3/transformed/activity-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.customview:customview:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/308bf84a7c990d2c72ea080b0ecc8ad2/transformed/customview-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core:1.17.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/ebe9b62c712cd928dcbf812658dfad2c/transformed/core-1.17.0/AndroidManifest.xml:17:1-30:12
+MERGED from [androidx.core:core-ktx:1.17.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/90898785ae908e9e092e72da4aaee843/transformed/core-ktx-1.17.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.room:room-ktx:2.6.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/814b7324f0af1f9690ded2e917504353/transformed/room-ktx-2.6.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.room:room-runtime:2.6.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/51dd790041caa356cc0692c3521f839b/transformed/room-runtime-2.6.1/AndroidManifest.xml:17:1-31:12
+MERGED from [androidx.annotation:annotation-experimental:1.4.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/2763a609a310781104b41578b166e38e/transformed/annotation-experimental-1.4.1/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.2] /home/gusjengis/.gradle/caches/9.1.0/transforms/3cdfe074969d1ecc811c28fcae23faba/transformed/lifecycle-livedata-core-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.2] /home/gusjengis/.gradle/caches/9.1.0/transforms/56ce16886195962a31843667bcb94643/transformed/lifecycle-viewmodel-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.2] /home/gusjengis/.gradle/caches/9.1.0/transforms/8dbeac5289183e1019cf467d57f95e7b/transformed/lifecycle-runtime-2.6.2/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.savedstate:savedstate:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/e7a58152bead9733dc6022d6f689d9b9/transformed/savedstate-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-service:2.6.2] /home/gusjengis/.gradle/caches/9.1.0/transforms/71e818dbde0a84967d2405748d0d7732/transformed/lifecycle-service-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.2] /home/gusjengis/.gradle/caches/9.1.0/transforms/11aca11bc7f49f880098a832eb272e18/transformed/lifecycle-livedata-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:17:1-55:12
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/5aee1077d2e6dc973b99c60ee9b43c3b/transformed/startup-runtime-1.1.1/AndroidManifest.xml:17:1-33:12
+MERGED from [androidx.tracing:tracing:1.2.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/df0a413f7931f7627b61df59de1f657d/transformed/tracing-1.2.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.tracing:tracing-ktx:1.2.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/9f3a4e2aa152d04bbcd621b261e48193/transformed/tracing-ktx-1.2.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core-viewtree:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/4a6ce5c5ecf49121de4e0da3248bfe03/transformed/core-viewtree-1.0.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/2ae19098c0eb8f7da096ffbe9cf7009d/transformed/interpolator-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/6448f6bbe85e45b775f568a82194eb5a/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/972b236252f52fc528e55de22998e45b/transformed/core-runtime-2.2.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.sqlite:sqlite-framework:2.4.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/57cceac1e227419e4e8c927c27168850/transformed/sqlite-framework-2.4.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.sqlite:sqlite:2.4.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/23f09e58f5b2c7a0cdeac25f771024ef/transformed/sqlite-2.4.0/AndroidManifest.xml:17:1-22:12
+	package
+		INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml
+	android:versionCode
+		INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:2:11-69
+uses-permission#android.permission.READ_CALENDAR
+ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:4:5-72
+	android:name
+		ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:4:22-69
+uses-permission#android.permission.RECEIVE_BOOT_COMPLETED
+ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:5:5-81
+MERGED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:25:5-81
+MERGED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:25:5-81
+	android:name
+		ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:5:22-78
+application
+ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:7:5-30:19
+INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:7:5-30:19
+MERGED from [com.google.android.gms:play-services-wearable:19.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7eb91a20ad4a217a6b3ad458a1205449/transformed/play-services-wearable-19.0.0/AndroidManifest.xml:22:5-20
+MERGED from [com.google.android.gms:play-services-wearable:19.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7eb91a20ad4a217a6b3ad458a1205449/transformed/play-services-wearable-19.0.0/AndroidManifest.xml:22:5-20
+MERGED from [com.google.android.gms:play-services-base:18.5.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/fb669f41c9e7a525f337c6733c90df90/transformed/play-services-base-18.5.0/AndroidManifest.xml:4:5-6:19
+MERGED from [com.google.android.gms:play-services-base:18.5.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/fb669f41c9e7a525f337c6733c90df90/transformed/play-services-base-18.5.0/AndroidManifest.xml:4:5-6:19
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/040302df573dc77d5928d7efbe4728e0/transformed/play-services-tasks-18.2.0/AndroidManifest.xml:4:5-20
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/040302df573dc77d5928d7efbe4728e0/transformed/play-services-tasks-18.2.0/AndroidManifest.xml:4:5-20
+MERGED from [com.google.android.gms:play-services-basement:18.4.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/8fa6f5fc4fa48e2f7b7dfe2d99315e1a/transformed/play-services-basement-18.4.0/AndroidManifest.xml:5:5-7:19
+MERGED from [com.google.android.gms:play-services-basement:18.4.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/8fa6f5fc4fa48e2f7b7dfe2d99315e1a/transformed/play-services-basement-18.4.0/AndroidManifest.xml:5:5-7:19
+MERGED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:28:5-143:19
+MERGED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:28:5-143:19
+MERGED from [androidx.core:core:1.17.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/ebe9b62c712cd928dcbf812658dfad2c/transformed/core-1.17.0/AndroidManifest.xml:28:5-89
+MERGED from [androidx.core:core:1.17.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/ebe9b62c712cd928dcbf812658dfad2c/transformed/core-1.17.0/AndroidManifest.xml:28:5-89
+MERGED from [androidx.room:room-runtime:2.6.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/51dd790041caa356cc0692c3521f839b/transformed/room-runtime-2.6.1/AndroidManifest.xml:23:5-29:19
+MERGED from [androidx.room:room-runtime:2.6.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/51dd790041caa356cc0692c3521f839b/transformed/room-runtime-2.6.1/AndroidManifest.xml:23:5-29:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/5aee1077d2e6dc973b99c60ee9b43c3b/transformed/startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/5aee1077d2e6dc973b99c60ee9b43c3b/transformed/startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/6448f6bbe85e45b775f568a82194eb5a/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/6448f6bbe85e45b775f568a82194eb5a/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+	android:extractNativeLibs
+		INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.17.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/ebe9b62c712cd928dcbf812658dfad2c/transformed/core-1.17.0/AndroidManifest.xml:28:18-86
+	android:supportsRtl
+		ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:10:9-35
+	android:label
+		ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:9:9-41
+	android:allowBackup
+		ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:8:9-35
+activity#com.example.calendarcomplication.phone.MainActivity
+ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:12:9-19:20
+	android:exported
+		ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:14:13-36
+	android:name
+		ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:13:13-41
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:15:13-18:29
+action#android.intent.action.MAIN
+ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:16:17-69
+	android:name
+		ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:16:25-66
+category#android.intent.category.LAUNCHER
+ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:17:17-77
+	android:name
+		ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:17:27-74
+receiver#com.example.calendarcomplication.phone.sync.BootRescheduleReceiver
+ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:21:9-29:20
+	android:enabled
+		ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:23:13-35
+	android:exported
+		ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:24:13-36
+	android:name
+		ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:22:13-56
+intent-filter#action:name:android.intent.action.BOOT_COMPLETED+action:name:android.intent.action.MY_PACKAGE_REPLACED
+ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:25:13-28:29
+action#android.intent.action.BOOT_COMPLETED
+ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:26:17-79
+	android:name
+		ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:26:25-76
+action#android.intent.action.MY_PACKAGE_REPLACED
+ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:27:17-84
+	android:name
+		ADDED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml:27:25-81
+uses-sdk
+INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml
+INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml
+MERGED from [com.google.android.gms:play-services-wearable:19.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7eb91a20ad4a217a6b3ad458a1205449/transformed/play-services-wearable-19.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-wearable:19.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7eb91a20ad4a217a6b3ad458a1205449/transformed/play-services-wearable-19.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-base:18.5.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/fb669f41c9e7a525f337c6733c90df90/transformed/play-services-base-18.5.0/AndroidManifest.xml:3:5-44
+MERGED from [com.google.android.gms:play-services-base:18.5.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/fb669f41c9e7a525f337c6733c90df90/transformed/play-services-base-18.5.0/AndroidManifest.xml:3:5-44
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/040302df573dc77d5928d7efbe4728e0/transformed/play-services-tasks-18.2.0/AndroidManifest.xml:3:5-44
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/040302df573dc77d5928d7efbe4728e0/transformed/play-services-tasks-18.2.0/AndroidManifest.xml:3:5-44
+MERGED from [com.google.android.gms:play-services-basement:18.4.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/8fa6f5fc4fa48e2f7b7dfe2d99315e1a/transformed/play-services-basement-18.4.0/AndroidManifest.xml:3:5-44
+MERGED from [com.google.android.gms:play-services-basement:18.4.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/8fa6f5fc4fa48e2f7b7dfe2d99315e1a/transformed/play-services-basement-18.4.0/AndroidManifest.xml:3:5-44
+MERGED from [androidx.work:work-runtime-ktx:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/41f442b39a1e15f53e5efe23aab06d7e/transformed/work-runtime-ktx-2.10.4/AndroidManifest.xml:20:5-44
+MERGED from [androidx.work:work-runtime-ktx:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/41f442b39a1e15f53e5efe23aab06d7e/transformed/work-runtime-ktx-2.10.4/AndroidManifest.xml:20:5-44
+MERGED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:21:5-44
+MERGED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:21:5-44
+MERGED from [androidx.fragment:fragment:1.1.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/735980ecba72aac7b37b716993588c0b/transformed/fragment-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.fragment:fragment:1.1.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/735980ecba72aac7b37b716993588c0b/transformed/fragment-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/c462427b26f3e41da19a1c16f8066be9/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/c462427b26f3e41da19a1c16f8066be9/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/46a32b986b620c7862260beaa7893ef0/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/46a32b986b620c7862260beaa7893ef0/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/d9d1bf5dac2b9a3bc91c35b411f7efe3/transformed/activity-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.activity:activity:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/d9d1bf5dac2b9a3bc91c35b411f7efe3/transformed/activity-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.customview:customview:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/308bf84a7c990d2c72ea080b0ecc8ad2/transformed/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/308bf84a7c990d2c72ea080b0ecc8ad2/transformed/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.17.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/ebe9b62c712cd928dcbf812658dfad2c/transformed/core-1.17.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.17.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/ebe9b62c712cd928dcbf812658dfad2c/transformed/core-1.17.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core-ktx:1.17.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/90898785ae908e9e092e72da4aaee843/transformed/core-ktx-1.17.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-ktx:1.17.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/90898785ae908e9e092e72da4aaee843/transformed/core-ktx-1.17.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.room:room-ktx:2.6.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/814b7324f0af1f9690ded2e917504353/transformed/room-ktx-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.room:room-ktx:2.6.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/814b7324f0af1f9690ded2e917504353/transformed/room-ktx-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.room:room-runtime:2.6.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/51dd790041caa356cc0692c3521f839b/transformed/room-runtime-2.6.1/AndroidManifest.xml:21:5-44
+MERGED from [androidx.room:room-runtime:2.6.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/51dd790041caa356cc0692c3521f839b/transformed/room-runtime-2.6.1/AndroidManifest.xml:21:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/2763a609a310781104b41578b166e38e/transformed/annotation-experimental-1.4.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/2763a609a310781104b41578b166e38e/transformed/annotation-experimental-1.4.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.2] /home/gusjengis/.gradle/caches/9.1.0/transforms/3cdfe074969d1ecc811c28fcae23faba/transformed/lifecycle-livedata-core-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.2] /home/gusjengis/.gradle/caches/9.1.0/transforms/3cdfe074969d1ecc811c28fcae23faba/transformed/lifecycle-livedata-core-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.2] /home/gusjengis/.gradle/caches/9.1.0/transforms/56ce16886195962a31843667bcb94643/transformed/lifecycle-viewmodel-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.2] /home/gusjengis/.gradle/caches/9.1.0/transforms/56ce16886195962a31843667bcb94643/transformed/lifecycle-viewmodel-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.2] /home/gusjengis/.gradle/caches/9.1.0/transforms/8dbeac5289183e1019cf467d57f95e7b/transformed/lifecycle-runtime-2.6.2/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.2] /home/gusjengis/.gradle/caches/9.1.0/transforms/8dbeac5289183e1019cf467d57f95e7b/transformed/lifecycle-runtime-2.6.2/AndroidManifest.xml:5:5-44
+MERGED from [androidx.savedstate:savedstate:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/e7a58152bead9733dc6022d6f689d9b9/transformed/savedstate-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.savedstate:savedstate:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/e7a58152bead9733dc6022d6f689d9b9/transformed/savedstate-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-service:2.6.2] /home/gusjengis/.gradle/caches/9.1.0/transforms/71e818dbde0a84967d2405748d0d7732/transformed/lifecycle-service-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-service:2.6.2] /home/gusjengis/.gradle/caches/9.1.0/transforms/71e818dbde0a84967d2405748d0d7732/transformed/lifecycle-service-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.2] /home/gusjengis/.gradle/caches/9.1.0/transforms/11aca11bc7f49f880098a832eb272e18/transformed/lifecycle-livedata-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.2] /home/gusjengis/.gradle/caches/9.1.0/transforms/11aca11bc7f49f880098a832eb272e18/transformed/lifecycle-livedata-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/5aee1077d2e6dc973b99c60ee9b43c3b/transformed/startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/5aee1077d2e6dc973b99c60ee9b43c3b/transformed/startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.tracing:tracing:1.2.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/df0a413f7931f7627b61df59de1f657d/transformed/tracing-1.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.tracing:tracing:1.2.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/df0a413f7931f7627b61df59de1f657d/transformed/tracing-1.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.tracing:tracing-ktx:1.2.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/9f3a4e2aa152d04bbcd621b261e48193/transformed/tracing-ktx-1.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.tracing:tracing-ktx:1.2.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/9f3a4e2aa152d04bbcd621b261e48193/transformed/tracing-ktx-1.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core-viewtree:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/4a6ce5c5ecf49121de4e0da3248bfe03/transformed/core-viewtree-1.0.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-viewtree:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/4a6ce5c5ecf49121de4e0da3248bfe03/transformed/core-viewtree-1.0.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/2ae19098c0eb8f7da096ffbe9cf7009d/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/2ae19098c0eb8f7da096ffbe9cf7009d/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/6448f6bbe85e45b775f568a82194eb5a/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/6448f6bbe85e45b775f568a82194eb5a/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/972b236252f52fc528e55de22998e45b/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/972b236252f52fc528e55de22998e45b/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.sqlite:sqlite-framework:2.4.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/57cceac1e227419e4e8c927c27168850/transformed/sqlite-framework-2.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.sqlite:sqlite-framework:2.4.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/57cceac1e227419e4e8c927c27168850/transformed/sqlite-framework-2.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.sqlite:sqlite:2.4.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/23f09e58f5b2c7a0cdeac25f771024ef/transformed/sqlite-2.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.sqlite:sqlite:2.4.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/23f09e58f5b2c7a0cdeac25f771024ef/transformed/sqlite-2.4.0/AndroidManifest.xml:20:5-44
+	android:targetSdkVersion
+		INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/phone/src/main/AndroidManifest.xml
+activity#com.google.android.gms.common.api.GoogleApiActivity
+ADDED from [com.google.android.gms:play-services-base:18.5.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/fb669f41c9e7a525f337c6733c90df90/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:9-173
+	android:exported
+		ADDED from [com.google.android.gms:play-services-base:18.5.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/fb669f41c9e7a525f337c6733c90df90/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:146-170
+	android:theme
+		ADDED from [com.google.android.gms:play-services-base:18.5.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/fb669f41c9e7a525f337c6733c90df90/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:86-145
+	android:name
+		ADDED from [com.google.android.gms:play-services-base:18.5.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/fb669f41c9e7a525f337c6733c90df90/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:19-85
+meta-data#com.google.android.gms.version
+ADDED from [com.google.android.gms:play-services-basement:18.4.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/8fa6f5fc4fa48e2f7b7dfe2d99315e1a/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:9-122
+	android:value
+		ADDED from [com.google.android.gms:play-services-basement:18.4.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/8fa6f5fc4fa48e2f7b7dfe2d99315e1a/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:66-119
+	android:name
+		ADDED from [com.google.android.gms:play-services-basement:18.4.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/8fa6f5fc4fa48e2f7b7dfe2d99315e1a/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:20-65
+uses-permission#android.permission.WAKE_LOCK
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:23:5-68
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:23:22-65
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:24:5-79
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:24:22-76
+uses-permission#android.permission.FOREGROUND_SERVICE
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:26:5-77
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:26:22-74
+provider#androidx.startup.InitializationProvider
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:29:9-37:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/5aee1077d2e6dc973b99c60ee9b43c3b/transformed/startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/5aee1077d2e6dc973b99c60ee9b43c3b/transformed/startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+	tools:node
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:33:13-31
+	android:authorities
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:31:13-68
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:32:13-37
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:30:13-67
+meta-data#androidx.work.WorkManagerInitializer
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:34:13-36:52
+	android:value
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:36:17-49
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:35:17-68
+service#androidx.work.impl.background.systemalarm.SystemAlarmService
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:39:9-45:35
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:42:13-72
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:43:13-37
+	tools:ignore
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:44:13-60
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:45:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:41:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:40:13-88
+service#androidx.work.impl.background.systemjob.SystemJobService
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:46:9-52:35
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:49:13-70
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:50:13-36
+	android:permission
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:51:13-69
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:52:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:48:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:47:13-84
+service#androidx.work.impl.foreground.SystemForegroundService
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:53:9-59:35
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:56:13-77
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:57:13-37
+	tools:ignore
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:58:13-60
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:59:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:55:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:54:13-81
+receiver#androidx.work.impl.utils.ForceStopRunnable$BroadcastReceiver
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:61:9-66:35
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:64:13-35
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:65:13-37
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:66:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:63:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:62:13-88
+receiver#androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryChargingProxy
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:67:9-77:20
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:70:13-36
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:71:13-37
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:72:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:69:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:68:13-106
+intent-filter#action:name:android.intent.action.ACTION_POWER_CONNECTED+action:name:android.intent.action.ACTION_POWER_DISCONNECTED
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:73:13-76:29
+action#android.intent.action.ACTION_POWER_CONNECTED
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:74:17-87
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:74:25-84
+action#android.intent.action.ACTION_POWER_DISCONNECTED
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:75:17-90
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:75:25-87
+receiver#androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryNotLowProxy
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:78:9-88:20
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:81:13-36
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:82:13-37
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:83:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:80:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:79:13-104
+intent-filter#action:name:android.intent.action.BATTERY_LOW+action:name:android.intent.action.BATTERY_OKAY
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:84:13-87:29
+action#android.intent.action.BATTERY_OKAY
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:85:17-77
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:85:25-74
+action#android.intent.action.BATTERY_LOW
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:86:17-76
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:86:25-73
+receiver#androidx.work.impl.background.systemalarm.ConstraintProxy$StorageNotLowProxy
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:89:9-99:20
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:92:13-36
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:93:13-37
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:94:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:91:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:90:13-104
+intent-filter#action:name:android.intent.action.DEVICE_STORAGE_LOW+action:name:android.intent.action.DEVICE_STORAGE_OK
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:95:13-98:29
+action#android.intent.action.DEVICE_STORAGE_LOW
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:96:17-83
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:96:25-80
+action#android.intent.action.DEVICE_STORAGE_OK
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:97:17-82
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:97:25-79
+receiver#androidx.work.impl.background.systemalarm.ConstraintProxy$NetworkStateProxy
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:100:9-109:20
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:103:13-36
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:104:13-37
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:105:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:102:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:101:13-103
+intent-filter#action:name:android.net.conn.CONNECTIVITY_CHANGE
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:106:13-108:29
+action#android.net.conn.CONNECTIVITY_CHANGE
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:107:17-79
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:107:25-76
+receiver#androidx.work.impl.background.systemalarm.RescheduleReceiver
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:110:9-121:20
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:113:13-36
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:114:13-37
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:115:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:112:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:111:13-88
+intent-filter#action:name:android.intent.action.BOOT_COMPLETED+action:name:android.intent.action.TIMEZONE_CHANGED+action:name:android.intent.action.TIME_SET
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:116:13-120:29
+action#android.intent.action.TIME_SET
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:118:17-73
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:118:25-70
+action#android.intent.action.TIMEZONE_CHANGED
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:119:17-81
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:119:25-78
+receiver#androidx.work.impl.background.systemalarm.ConstraintProxyUpdateReceiver
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:122:9-131:20
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:125:13-72
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:126:13-37
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:127:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:124:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:123:13-99
+intent-filter#action:name:androidx.work.impl.background.systemalarm.UpdateProxies
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:128:13-130:29
+action#androidx.work.impl.background.systemalarm.UpdateProxies
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:129:17-98
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:129:25-95
+receiver#androidx.work.impl.diagnostics.DiagnosticsReceiver
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:132:9-142:20
+	android:enabled
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:135:13-35
+	android:exported
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:136:13-36
+	android:permission
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:137:13-57
+	tools:targetApi
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:138:13-32
+	android:directBootAware
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:134:13-44
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:133:13-78
+intent-filter#action:name:androidx.work.diagnostics.REQUEST_DIAGNOSTICS
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:139:13-141:29
+action#androidx.work.diagnostics.REQUEST_DIAGNOSTICS
+ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:140:17-88
+	android:name
+		ADDED from [androidx.work:work-runtime:2.10.4] /home/gusjengis/.gradle/caches/9.1.0/transforms/0a63c5dde9d5f4aaf547f5e59c173519/transformed/work-runtime-2.10.4/AndroidManifest.xml:140:25-85
+permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.17.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/ebe9b62c712cd928dcbf812658dfad2c/transformed/core-1.17.0/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.17.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/ebe9b62c712cd928dcbf812658dfad2c/transformed/core-1.17.0/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.17.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/ebe9b62c712cd928dcbf812658dfad2c/transformed/core-1.17.0/AndroidManifest.xml:23:9-81
+permission#com.example.calendarcomplication.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.17.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/ebe9b62c712cd928dcbf812658dfad2c/transformed/core-1.17.0/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.17.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/ebe9b62c712cd928dcbf812658dfad2c/transformed/core-1.17.0/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.17.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/ebe9b62c712cd928dcbf812658dfad2c/transformed/core-1.17.0/AndroidManifest.xml:23:9-81
+uses-permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.17.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/ebe9b62c712cd928dcbf812658dfad2c/transformed/core-1.17.0/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.17.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/ebe9b62c712cd928dcbf812658dfad2c/transformed/core-1.17.0/AndroidManifest.xml:26:22-94
+uses-permission#com.example.calendarcomplication.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.17.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/ebe9b62c712cd928dcbf812658dfad2c/transformed/core-1.17.0/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.17.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/ebe9b62c712cd928dcbf812658dfad2c/transformed/core-1.17.0/AndroidManifest.xml:26:22-94
+service#androidx.room.MultiInstanceInvalidationService
+ADDED from [androidx.room:room-runtime:2.6.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/51dd790041caa356cc0692c3521f839b/transformed/room-runtime-2.6.1/AndroidManifest.xml:24:9-28:63
+	android:exported
+		ADDED from [androidx.room:room-runtime:2.6.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/51dd790041caa356cc0692c3521f839b/transformed/room-runtime-2.6.1/AndroidManifest.xml:27:13-37
+	tools:ignore
+		ADDED from [androidx.room:room-runtime:2.6.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/51dd790041caa356cc0692c3521f839b/transformed/room-runtime-2.6.1/AndroidManifest.xml:28:13-60
+	android:directBootAware
+		ADDED from [androidx.room:room-runtime:2.6.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/51dd790041caa356cc0692c3521f839b/transformed/room-runtime-2.6.1/AndroidManifest.xml:26:13-43
+	android:name
+		ADDED from [androidx.room:room-runtime:2.6.1] /home/gusjengis/.gradle/caches/9.1.0/transforms/51dd790041caa356cc0692c3521f839b/transformed/room-runtime-2.6.1/AndroidManifest.xml:25:13-74
+meta-data#androidx.profileinstaller.ProfileInstallerInitializer
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:30:17-85
+receiver#androidx.profileinstaller.ProfileInstallReceiver
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:34:9-52:20
+	android:enabled
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:38:13-36
+	android:permission
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:39:13-57
+	android:directBootAware
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:36:13-44
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:35:13-76
+intent-filter#action:name:androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:40:13-42:29
+action#androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:17-91
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:25-88
+intent-filter#action:name:androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:43:13-45:29
+action#androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:17-85
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:25-82
+intent-filter#action:name:androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:46:13-48:29
+action#androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:17-88
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:25-85
+intent-filter#action:name:androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:49:13-51:29
+action#androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:17-95
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/gusjengis/.gradle/caches/9.1.0/transforms/7edffa823ef29ae636fb0c08402297c1/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:25-92

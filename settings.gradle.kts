@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "CalendarComplication"
 include(":app")
+include(":phone")
  
