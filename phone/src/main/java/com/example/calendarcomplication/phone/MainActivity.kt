@@ -18,7 +18,9 @@ import androidx.activity.ComponentActivity
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.wear.compose.material.MaterialTheme
 import androidx.compose.ui.res.stringResource
 import com.example.calendarcomplication.core.render.CalendarPreviewRenderer
@@ -73,6 +75,24 @@ class MainActivity : ComponentActivity() {
             setPadding(24, 24, 24, 24)
             setBackgroundColor(Color.BLACK)
         }
+        val baseStartPadding = container.paddingStart
+        val baseTopPadding = container.paddingTop
+        val baseEndPadding = container.paddingEnd
+        val baseBottomPadding = container.paddingBottom
+        ViewCompat.setOnApplyWindowInsetsListener(container) { view, insets ->
+            val safeInsets = insets.getInsets(
+                WindowInsetsCompat.Type.statusBars() or
+                    WindowInsetsCompat.Type.navigationBars() or
+                    WindowInsetsCompat.Type.displayCutout()
+            )
+            view.setPaddingRelative(
+                baseStartPadding + safeInsets.left,
+                baseTopPadding + safeInsets.top,
+                baseEndPadding + safeInsets.right,
+                baseBottomPadding + safeInsets.bottom
+            )
+            insets
+        }
 
         previewView = ImageView(this).apply {
             adjustViewBounds = true
@@ -118,6 +138,7 @@ class MainActivity : ComponentActivity() {
             container.addView(settingsView)
         }
         setContentView(container)
+        ViewCompat.requestApplyInsets(container)
 
         settingsView.setContent {
             MaterialTheme {
