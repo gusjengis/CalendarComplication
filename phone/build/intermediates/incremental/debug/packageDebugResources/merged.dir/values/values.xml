@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Calendar Companion Sync</string>
+    <string name="settings_24_hour_subtitle">Switch between 12h and 24h clock</string>
+    <string name="settings_24_hour_title">Use 24-hour time</string>
+    <string name="settings_hide_past_labels_subtitle">When on, labels disappear after events end</string>
+    <string name="settings_hide_past_labels_title">Hide past event labels</string>
+    <string name="settings_recurring_label_subtitle">Show labels for events also found yesterday or tomorrow</string>
+    <string name="settings_recurring_label_title">Show daily event labels</string>
+    <string name="settings_title">Complication Settings</string>
 </resources>

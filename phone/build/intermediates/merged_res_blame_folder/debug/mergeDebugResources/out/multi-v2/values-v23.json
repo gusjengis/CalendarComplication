@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.calendarcomplication.phone-mergeDebugResources-25:/values-v23/values-v23.xml",
+            "outputFile": "com.example.calendarcomplication.phone-mergeDebugResources-55:/values-v23/values-v23.xml",
             "map": [
                 {
                     "source": "/home/gusjengis/.gradle/caches/9.1.0/transforms/218fa19eda49b49c699442181b81cffc/transformed/work-runtime-2.10.4/res/values-v23/values-v23.xml",

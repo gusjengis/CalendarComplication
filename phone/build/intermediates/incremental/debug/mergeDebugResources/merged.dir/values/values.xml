@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2" xmlns:ns2="http://schemas.android.com/tools">
     <attr format="string" name="fontProviderSystemFontFamily"/>
     <attr format="string" name="fontVariationSettings"/>
     <attr format="reference" name="nestedScrollViewStyle"/>
@@ -78,8 +78,17 @@
     <item name="accessibility_custom_action_7" type="id"/>
     <item name="accessibility_custom_action_8" type="id"/>
     <item name="accessibility_custom_action_9" type="id"/>
+    <item name="androidx_compose_ui_view_composition_context" type="id"/>
+    <item name="compose_view_saveable_id_tag" type="id"/>
+    <item name="consume_window_insets_tag" type="id"/>
+    <item name="hide_graphics_layer_in_inspector_tag" type="id"/>
+    <item name="hide_in_inspector_tag" type="id"/>
+    <item name="inspection_slot_table_set" type="id"/>
+    <item name="is_pooling_container_tag" type="id"/>
     <item name="line1" type="id"/>
     <item name="line3" type="id"/>
+    <item name="pooling_container_listener_holder_tag" type="id"/>
+    <item name="report_drawn" type="id"/>
     <item name="tag_accessibility_actions" type="id"/>
     <item name="tag_accessibility_clickable_spans" type="id"/>
     <item name="tag_accessibility_heading" type="id"/>
@@ -100,7 +109,10 @@
     <item name="title" type="id"/>
     <id name="view_tree_disjoint_parent"/>
     <id name="view_tree_lifecycle_owner"/>
+    <id name="view_tree_on_back_pressed_dispatcher_owner"/>
+    <id name="view_tree_saved_state_registry_owner"/>
     <id name="view_tree_view_model_store_owner"/>
+    <item name="wrapped_composition_tag" type="id"/>
     <integer name="google_play_services_version">12451000</integer>
     <integer name="status_bar_notification_info_maxnum">999</integer>
     <string name="androidx_startup" translatable="false">androidx.startup</string>
@@ -112,6 +124,8 @@
     <string name="call_notification_incoming_text">Incoming call</string>
     <string name="call_notification_ongoing_text">Ongoing call</string>
     <string name="call_notification_screening_text">Screening an incoming call</string>
+    <string name="close_drawer">"Close navigation menu"</string>
+    <string name="close_sheet">"Close sheet"</string>
     <string msgid="2523291102206661146" name="common_google_play_services_enable_button">Enable</string>
     <string msgid="227660514972886228" name="common_google_play_services_enable_text"><ns1:g id="app_name">%1$s</ns1:g> won\'t work unless you enable Google Play services.</string>
     <string msgid="5122002158466380389" name="common_google_play_services_enable_title">Enable Google Play services</string>
@@ -130,7 +144,42 @@
     <string name="common_open_on_phone">Open on phone</string>
     <string name="common_signin_button_text">Sign in</string>
     <string name="common_signin_button_text_long">Sign in with Google</string>
+    <string name="default_error_message">"Invalid input"</string>
+    <string name="default_popup_window_title" ns2:ignore="ExtraTranslation">"Pop-Up Window"</string>
+    <string name="dropdown_menu">"Dropdown menu"</string>
+    <string name="in_progress">In progress</string>
+    <string name="indeterminate">Partially checked</string>
+    <string name="navigation_menu">"Navigation menu"</string>
+    <string name="not_selected">Not selected</string>
+    <string name="range_end">"Range end"</string>
+    <string name="range_start">"Range start"</string>
+    <string name="selected">Selected</string>
+    <string name="settings_24_hour_subtitle">Switch between 12h and 24h clock</string>
+    <string name="settings_24_hour_title">Use 24-hour time</string>
+    <string name="settings_hide_past_labels_subtitle">When on, labels disappear after events end</string>
+    <string name="settings_hide_past_labels_title">Hide past event labels</string>
+    <string name="settings_recurring_label_subtitle">Show labels for events also found yesterday or tomorrow</string>
+    <string name="settings_recurring_label_title">Show daily event labels</string>
+    <string name="settings_title">Complication Settings</string>
+    <string name="state_empty">Empty</string>
+    <string name="state_off">Off</string>
+    <string name="state_on">On</string>
     <string name="status_bar_notification_info_overflow">999+</string>
+    <string name="switch_role">Switch</string>
+    <string name="tab">Tab</string>
+    <string name="template_percent"><ns1:g id="percentage">%1$d</ns1:g> percent.</string>
+    <string name="tooltip_description">tooltip</string>
+    <string name="tooltip_label">show tooltip</string>
+    <style name="DialogWindowTheme">
+        <item name="android:windowClipToOutline">false</item>
+    </style>
+    <style name="FloatingDialogTheme">
+        <item name="android:windowIsFloating">false</item>
+    </style>
+    <style name="FloatingDialogWindowTheme">
+        <item name="android:windowClipToOutline">false</item>
+        <item name="android:dialogTheme">@style/FloatingDialogTheme</item>
+    </style>
     <style name="TextAppearance.Compat.Notification" parent="@android:style/TextAppearance.StatusBar.EventContent"/>
     <style name="TextAppearance.Compat.Notification.Info">
         <item name="android:textSize">12sp</item>

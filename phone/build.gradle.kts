@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -33,6 +34,10 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {
@@ -40,4 +45,8 @@ dependencies {
     implementation(libs.play.services.wearable)
     implementation(libs.work.runtime.ktx)
     implementation(libs.core.ktx)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.ui)
+    implementation(libs.compose.material)
+    implementation(libs.compose.foundation)
 }

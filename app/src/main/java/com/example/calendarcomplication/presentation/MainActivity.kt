@@ -19,12 +19,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.DisposableEffect
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.content.ContextCompat
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,20 +39,15 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.input.rotary.onPreRotaryScrollEvent
 import androidx.compose.ui.input.rotary.onRotaryScrollEvent
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.rememberScalingLazyListState
-import androidx.wear.compose.material.ScalingLazyColumn
-import androidx.wear.compose.material.Switch
-import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
-import androidx.wear.compose.material.ToggleChip
 import androidx.wear.tooling.preview.devices.WearDevices
 import com.example.calendarcomplication.R
 import com.example.calendarcomplication.complication.MainComplicationService
+import com.example.calendarcomplication.core.settings.ComplicationSettingsList
 import com.example.calendarcomplication.presentation.theme.CalendarComplicationTheme
 import com.example.calendarcomplication.core.settings.CalendarSettingsStore
 import com.example.calendarcomplication.core.sync.SettingsSyncContract
@@ -161,67 +153,23 @@ fun SettingsScreen() {
                 true
             }
     ) {
-        ScalingLazyColumn(
-            modifier = Modifier.fillMaxSize(),
+        ComplicationSettingsList(
+            settings = settings,
             state = listState,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            contentPadding = PaddingValues(start = 10.dp, end = 10.dp, top = 30.dp, bottom = 20.dp)
-        ) {
-            item {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 6.dp),
-                    text = stringResource(R.string.settings_title),
-                    color = MaterialTheme.colors.primary
-                )
+            title = stringResource(R.string.settings_title),
+            recurringTitle = stringResource(R.string.settings_recurring_label_title),
+            recurringSubtitle = stringResource(R.string.settings_recurring_label_subtitle),
+            twentyFourHourTitle = stringResource(R.string.settings_24_hour_title),
+            twentyFourHourSubtitle = stringResource(R.string.settings_24_hour_subtitle),
+            hidePastTitle = stringResource(R.string.settings_hide_past_labels_title),
+            hidePastSubtitle = stringResource(R.string.settings_hide_past_labels_subtitle),
+            onSettingsChange = { newSettings ->
+                settings = newSettings
+                CalendarSettingsStore.save(context, settings)
+                SettingsSyncTransmitter.push(context, settings, source = "watch")
+                MainComplicationService.forceUpdateNow(context)
             }
-            item {
-                ToggleChip(
-                    modifier = Modifier.fillMaxWidth(),
-                    checked = settings.showRecurringLabels,
-                    onCheckedChange = { checked ->
-                        settings = settings.copy(showRecurringLabels = checked)
-                        CalendarSettingsStore.save(context, settings)
-                        SettingsSyncTransmitter.push(context, settings, source = "watch")
-                        MainComplicationService.forceUpdateNow(context)
-                    },
-                    label = { Text(stringResource(R.string.settings_recurring_label_title)) },
-                    secondaryLabel = { Text(stringResource(R.string.settings_recurring_label_subtitle)) },
-                    toggleControl = { Switch(checked = settings.showRecurringLabels) }
-                )
-            }
-            item {
-                ToggleChip(
-                    modifier = Modifier.fillMaxWidth(),
-                    checked = settings.use24HourTime,
-                    onCheckedChange = { checked ->
-                        settings = settings.copy(use24HourTime = checked)
-                        CalendarSettingsStore.save(context, settings)
-                        SettingsSyncTransmitter.push(context, settings, source = "watch")
-                        MainComplicationService.forceUpdateNow(context)
-                    },
-                    label = { Text(stringResource(R.string.settings_24_hour_title)) },
-                    secondaryLabel = { Text(stringResource(R.string.settings_24_hour_subtitle)) },
-                    toggleControl = { Switch(checked = settings.use24HourTime) }
-                )
-            }
-            item {
-                ToggleChip(
-                    modifier = Modifier.fillMaxWidth(),
-                    checked = settings.hidePastEventLabels,
-                    onCheckedChange = { checked ->
-                        settings = settings.copy(hidePastEventLabels = checked)
-                        CalendarSettingsStore.save(context, settings)
-                        SettingsSyncTransmitter.push(context, settings, source = "watch")
-                        MainComplicationService.forceUpdateNow(context)
-                    },
-                    label = { Text(stringResource(R.string.settings_hide_past_labels_title)) },
-                    secondaryLabel = { Text(stringResource(R.string.settings_hide_past_labels_subtitle)) },
-                    toggleControl = { Switch(checked = settings.hidePastEventLabels) }
-                )
-            }
-        }
+        )
     }
 }
 

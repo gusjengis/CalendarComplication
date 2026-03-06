@@ -1,43 +1,45 @@
 package com.example.calendarcomplication.phone
 
 import android.Manifest
-import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
-import androidx.core.content.ContextCompat
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.ScrollView
-import android.widget.Switch
 import android.widget.TextView
+import androidx.activity.ComponentActivity
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.ComposeView
+import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
+import androidx.wear.compose.material.MaterialTheme
+import androidx.wear.compose.material.rememberScalingLazyListState
+import androidx.compose.ui.res.stringResource
 import com.example.calendarcomplication.core.render.CalendarPreviewRenderer
 import com.example.calendarcomplication.core.render.CalendarRenderEvent
 import com.example.calendarcomplication.core.render.CalendarRenderProbe
 import com.example.calendarcomplication.core.settings.CalendarSettings
 import com.example.calendarcomplication.core.settings.CalendarSettingsStore
+import com.example.calendarcomplication.core.settings.ComplicationSettingsList
 import com.example.calendarcomplication.core.sync.SettingsSyncContract
 import com.example.calendarcomplication.phone.sync.CalendarSyncScheduler
 import com.example.calendarcomplication.phone.sync.CalendarSyncTransmitter
 import com.example.calendarcomplication.phone.sync.SettingsSyncTransmitter
 import java.util.Calendar
 
-class MainActivity : Activity() {
+class MainActivity : ComponentActivity() {
     private lateinit var statusView: TextView
     private lateinit var previewView: ImageView
-    private lateinit var previewHeaderView: TextView
-    private lateinit var settingsHeaderView: TextView
-    private lateinit var recurringSwitch: Switch
-    private lateinit var use24HourSwitch: Switch
-    private lateinit var hidePastSwitch: Switch
-
-    private var settings: CalendarSettings = CalendarSettings(
-        showRecurringLabels = false,
-        use24HourTime = false,
-        hidePastEventLabels = true
+    private val settingsState = mutableStateOf(
+        CalendarSettings(
+            showRecurringLabels = false,
+            use24HourTime = false,
+            hidePastEventLabels = true
+        )
     )
 
     private val settingsUpdatedReceiver = object : BroadcastReceiver() {
@@ -45,8 +47,7 @@ class MainActivity : Activity() {
             if (intent?.action != SettingsSyncContract.ACTION_SETTINGS_UPDATED) {
                 return
             }
-            settings = CalendarSettingsStore.load(this@MainActivity)
-            bindSettingsUi()
+            settingsState.value = CalendarSettingsStore.load(this@MainActivity)
             if (checkSelfPermission(Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
                 refreshPreview()
             }
@@ -56,57 +57,60 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        WindowCompat.setDecorFitsSystemWindows(window, true)
+        window.statusBarColor = Color.BLACK
+
         val container = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(36, 48, 36, 48)
-        }
-
-        previewHeaderView = TextView(this).apply {
-            text = "Watch Face Preview"
-            textSize = 20f
-            setPadding(0, 0, 0, 12)
+            setPadding(24, 24, 24, 24)
+            setBackgroundColor(Color.BLACK)
         }
 
         previewView = ImageView(this).apply {
             adjustViewBounds = true
+            scaleType = ImageView.ScaleType.FIT_CENTER
             minimumHeight = 450
             minimumWidth = 450
-            setPadding(0, 0, 0, 24)
-        }
-
-        settingsHeaderView = TextView(this).apply {
-            text = "Settings"
-            textSize = 20f
-            setPadding(0, 12, 0, 12)
+            setPadding(0, 0, 0, 16)
         }
 
         statusView = TextView(this).apply {
-            textSize = 18f
-            setPadding(0, 16, 0, 0)
+            textSize = 16f
+            setPadding(0, 0, 0, 8)
         }
 
-        recurringSwitch = Switch(this).apply {
-            text = "Show daily event labels"
-        }
-        use24HourSwitch = Switch(this).apply {
-            text = "Use 24-hour time"
-        }
-        hidePastSwitch = Switch(this).apply {
-            text = "Hide past event labels"
+        val settingsView = ComposeView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                0,
+                1f
+            )
+            setContent {
+                MaterialTheme {
+                    val listState = rememberScalingLazyListState()
+                    ComplicationSettingsList(
+                        settings = settingsState.value,
+                        state = listState,
+                        title = stringResource(R.string.settings_title),
+                        recurringTitle = stringResource(R.string.settings_recurring_label_title),
+                        recurringSubtitle = stringResource(R.string.settings_recurring_label_subtitle),
+                        twentyFourHourTitle = stringResource(R.string.settings_24_hour_title),
+                        twentyFourHourSubtitle = stringResource(R.string.settings_24_hour_subtitle),
+                        hidePastTitle = stringResource(R.string.settings_hide_past_labels_title),
+                        hidePastSubtitle = stringResource(R.string.settings_hide_past_labels_subtitle),
+                        onSettingsChange = { newSettings -> applySettingsAndSync(newSettings) }
+                    )
+                }
+            }
         }
 
-        container.addView(previewHeaderView)
         container.addView(previewView)
-        container.addView(settingsHeaderView)
         container.addView(statusView)
-        container.addView(recurringSwitch)
-        container.addView(use24HourSwitch)
-        container.addView(hidePastSwitch)
-        setContentView(ScrollView(this).apply { addView(container) })
+        container.addView(settingsView)
+        setContentView(container)
 
         CalendarSyncScheduler.schedulePeriodic(this)
-        settings = CalendarSettingsStore.load(this)
-        bindSettingsUi()
+        settingsState.value = CalendarSettingsStore.load(this)
 
         if (checkSelfPermission(Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
             statusView.text = "Calendar permission granted. Syncing to watch..."
@@ -127,8 +131,7 @@ class MainActivity : Activity() {
             IntentFilter(SettingsSyncContract.ACTION_SETTINGS_UPDATED),
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
-        settings = CalendarSettingsStore.load(this)
-        bindSettingsUi()
+        settingsState.value = CalendarSettingsStore.load(this)
         if (checkSelfPermission(Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
             refreshPreview()
         }
@@ -156,38 +159,16 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun bindSettingsUi() {
-        recurringSwitch.setOnCheckedChangeListener(null)
-        use24HourSwitch.setOnCheckedChangeListener(null)
-        hidePastSwitch.setOnCheckedChangeListener(null)
-
-        recurringSwitch.isChecked = settings.showRecurringLabels
-        use24HourSwitch.isChecked = settings.use24HourTime
-        hidePastSwitch.isChecked = settings.hidePastEventLabels
-
-        recurringSwitch.setOnCheckedChangeListener { _, checked ->
-            settings = settings.copy(showRecurringLabels = checked)
-            applySettingsAndSync()
-        }
-        use24HourSwitch.setOnCheckedChangeListener { _, checked ->
-            settings = settings.copy(use24HourTime = checked)
-            applySettingsAndSync()
-        }
-        hidePastSwitch.setOnCheckedChangeListener { _, checked ->
-            settings = settings.copy(hidePastEventLabels = checked)
-            applySettingsAndSync()
-        }
-    }
-
-    private fun applySettingsAndSync() {
-        CalendarSettingsStore.save(this, settings)
+    private fun applySettingsAndSync(newSettings: CalendarSettings) {
+        settingsState.value = newSettings
+        CalendarSettingsStore.save(this, newSettings)
         pushSettingsToWatch("phone")
         CalendarSyncScheduler.triggerImmediate(this)
         refreshPreview()
     }
 
     private fun pushSettingsToWatch(source: String) {
-        SettingsSyncTransmitter.push(this, settings, source = source)
+        SettingsSyncTransmitter.push(this, settingsState.value, source = source)
     }
 
     private fun refreshPreview() {
@@ -216,7 +197,7 @@ class MainActivity : Activity() {
             }
 
         val bitmap = CalendarPreviewRenderer.render(
-            settings = settings,
+            settings = settingsState.value,
             probe = CalendarRenderProbe(
                 dayEvents = dayEvents,
                 dayStartMillis = dayBounds.first,
