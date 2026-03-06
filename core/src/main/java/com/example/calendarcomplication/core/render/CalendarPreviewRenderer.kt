@@ -26,6 +26,8 @@ object CalendarPreviewRenderer {
         val hidePastEventLabels = settings.hidePastEventLabels
         val use24HourTime = settings.use24HourTime
         val nowMillis = probe.nowMillis
+        var eventTimingText: String? = null
+        var eventTimingColor = Color.rgb(172, 196, 255)
 
         val bgPaint = Paint().apply {
             color = Color.BLACK
@@ -238,6 +240,26 @@ object CalendarPreviewRenderer {
 
                     for ((eventIndex, variantIndex) in chosenVariantByEvent) {
                         resolvedColorByEventIndex[eventIndex] = variants[variantIndex]
+                    }
+                }
+
+                val activeEvent = clippedEvents
+                    .filter { it.startMillis <= nowMillis && nowMillis < it.endMillis }
+                    .minByOrNull { it.endMillis }
+                if (activeEvent != null) {
+                    val remainingMillis = (activeEvent.endMillis - nowMillis).coerceAtLeast(0L)
+                    eventTimingText = "${formatDurationCompact(remainingMillis)} left"
+                    eventTimingColor = resolvedColorByEventIndex[activeEvent.eventIndex]
+                        ?: activeEvent.event.color
+                } else {
+                    val nextEvent = clippedEvents
+                        .filter { it.startMillis > nowMillis }
+                        .minByOrNull { it.startMillis }
+                    if (nextEvent != null) {
+                        val untilStartMillis = (nextEvent.startMillis - nowMillis).coerceAtLeast(0L)
+                        eventTimingText = "in ${formatDurationCompact(untilStartMillis)}"
+                        eventTimingColor = resolvedColorByEventIndex[nextEvent.eventIndex]
+                            ?: nextEvent.event.color
                     }
                 }
             }
@@ -812,16 +834,13 @@ object CalendarPreviewRenderer {
         val nowCal = java.util.Calendar.getInstance()
         val minute = nowCal.get(java.util.Calendar.MINUTE)
         val timeText: String
-        val amPmText: String?
         if (use24HourTime) {
             val hour24 = nowCal.get(java.util.Calendar.HOUR_OF_DAY)
             timeText = String.format(Locale.getDefault(), "%02d:%02d", hour24, minute)
-            amPmText = null
         } else {
             val hour12Raw = nowCal.get(java.util.Calendar.HOUR)
             val hour12 = if (hour12Raw == 0) 12 else hour12Raw
             timeText = String.format(Locale.getDefault(), "%d:%02d", hour12, minute)
-            amPmText = if (nowCal.get(java.util.Calendar.AM_PM) == java.util.Calendar.AM) "AM" else "PM"
         }
 
         val timeShadowPaint = Paint().apply {
@@ -836,8 +855,14 @@ object CalendarPreviewRenderer {
             textAlign = Paint.Align.CENTER
             isAntiAlias = true
         }
-        val amPmPaint = Paint().apply {
-            color = Color.rgb(172, 196, 255)
+        val eventTimingShadowPaint = Paint().apply {
+            color = Color.argb(160, 0, 0, 0)
+            textSize = 20f
+            textAlign = Paint.Align.CENTER
+            isAntiAlias = true
+        }
+        val eventTimingPaint = Paint().apply {
+            color = eventTimingColor
             textSize = 20f
             textAlign = Paint.Align.CENTER
             isAntiAlias = true
@@ -845,8 +870,9 @@ object CalendarPreviewRenderer {
 
         canvas.drawText(timeText, center + 1f, center + 16f, timeShadowPaint)
         canvas.drawText(timeText, center, center + 15f, timePaint)
-        if (amPmText != null) {
-            canvas.drawText(amPmText, center, center + 35f, amPmPaint)
+        if (eventTimingText != null) {
+            canvas.drawText(eventTimingText, center + 1f, center + 36f, eventTimingShadowPaint)
+            canvas.drawText(eventTimingText, center, center + 35f, eventTimingPaint)
         }
 
         return bitmap
@@ -871,5 +897,17 @@ object CalendarPreviewRenderer {
             end -= 1
         }
         return ""
+    }
+
+    private fun formatDurationCompact(durationMillis: Long): String {
+        val totalMinutes = (durationMillis / 60_000L).coerceAtLeast(0L)
+        val hours = totalMinutes / 60L
+        val minutes = totalMinutes % 60L
+        return when {
+            hours > 0L && minutes > 0L -> "${hours}h ${minutes}m"
+            hours > 0L -> "${hours}h"
+            totalMinutes > 0L -> "${totalMinutes}m"
+            else -> "<1m"
+        }
     }
 }
