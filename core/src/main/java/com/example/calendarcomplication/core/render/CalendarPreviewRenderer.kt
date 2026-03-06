@@ -858,13 +858,13 @@ object CalendarPreviewRenderer {
         }
         val eventTimingShadowPaint = Paint().apply {
             color = Color.argb(160, 0, 0, 0)
-            textSize = 20f
+            textSize = 24f
             textAlign = Paint.Align.CENTER
             isAntiAlias = true
         }
         val eventTimingPaint = Paint().apply {
             color = eventTimingColor
-            textSize = 20f
+            textSize = 24f
             textAlign = Paint.Align.CENTER
             isAntiAlias = true
         }
@@ -872,8 +872,8 @@ object CalendarPreviewRenderer {
         canvas.drawText(timeText, center + 1f, center + 16f, timeShadowPaint)
         canvas.drawText(timeText, center, center + 15f, timePaint)
         if (eventTimingText != null) {
-            canvas.drawText(eventTimingText, center + 1f, center + 36f, eventTimingShadowPaint)
-            canvas.drawText(eventTimingText, center, center + 35f, eventTimingPaint)
+            canvas.drawText(eventTimingText, center + 1f, center + 42f, eventTimingShadowPaint)
+            canvas.drawText(eventTimingText, center, center + 41f, eventTimingPaint)
         }
 
         return bitmap
