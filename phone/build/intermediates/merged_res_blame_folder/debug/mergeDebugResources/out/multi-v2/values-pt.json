@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.calendarcomplication.phone-mergeDebugResources-24:/values-pt/values-pt.xml",
+            "outputFile": "com.example.calendarcomplication.phone-mergeDebugResources-25:/values-pt/values-pt.xml",
             "map": [
                 {
-                    "source": "/home/gusjengis/.gradle/caches/9.1.0/transforms/ebe9b62c712cd928dcbf812658dfad2c/transformed/core-1.17.0/res/values-pt/values-pt.xml",
+                    "source": "/home/gusjengis/.gradle/caches/9.1.0/transforms/655baca29096b714926bb9dae2b64583/transformed/core-1.17.0/res/values-pt/values-pt.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",

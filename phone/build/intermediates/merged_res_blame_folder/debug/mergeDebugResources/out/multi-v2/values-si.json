@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.calendarcomplication.phone-mergeDebugResources-24:/values-si/values-si.xml",
+            "outputFile": "com.example.calendarcomplication.phone-mergeDebugResources-25:/values-si/values-si.xml",
             "map": [
                 {
-                    "source": "/home/gusjengis/.gradle/caches/9.1.0/transforms/fb669f41c9e7a525f337c6733c90df90/transformed/play-services-base-18.5.0/res/values-si/values.xml",
+                    "source": "/home/gusjengis/.gradle/caches/9.1.0/transforms/ac4ef5f0f288a979b21f780323d14b7e/transformed/play-services-base-18.5.0/res/values-si/values.xml",
                     "from": {
                         "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
                         "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "/home/gusjengis/.gradle/caches/9.1.0/transforms/8fa6f5fc4fa48e2f7b7dfe2d99315e1a/transformed/play-services-basement-18.4.0/res/values-si/values.xml",
+                    "source": "/home/gusjengis/.gradle/caches/9.1.0/transforms/37622c3517a3e1e5d5c7ad62a7df8ce1/transformed/play-services-basement-18.4.0/res/values-si/values.xml",
                     "from": {
                         "startLines": "4",
                         "startColumns": "0",
@@ -38,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "/home/gusjengis/.gradle/caches/9.1.0/transforms/ebe9b62c712cd928dcbf812658dfad2c/transformed/core-1.17.0/res/values-si/values-si.xml",
+                    "source": "/home/gusjengis/.gradle/caches/9.1.0/transforms/655baca29096b714926bb9dae2b64583/transformed/core-1.17.0/res/values-si/values-si.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",

@@ -48,6 +48,14 @@
             </intent-filter>
         </receiver>
 
+        <service
+            android:name="com.example.calendarcomplication.phone.sync.SettingsSyncListenerService"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
+            </intent-filter>
+        </service>
+
         <activity
             android:name="com.google.android.gms.common.api.GoogleApiActivity"
             android:exported="false"

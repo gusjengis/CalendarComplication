@@ -36,6 +36,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core"))
     implementation(libs.play.services.wearable)
     implementation(libs.work.runtime.ktx)
     implementation(libs.core.ktx)

@@ -4,6 +4,7 @@ import android.content.Context
 import android.database.Cursor
 import android.graphics.Color
 import android.provider.CalendarContract
+import com.example.calendarcomplication.core.render.CalendarRenderEvent
 import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
@@ -17,31 +18,32 @@ object CalendarSyncTransmitter {
     private const val KEY_ACCOUNT_HINT = "account_hint"
     private const val KEY_EVENTS_JSON = "events_json"
 
-    private data class PhoneEvent(
-        val eventId: Long,
-        val startMillis: Long,
-        val endMillis: Long,
-        val title: String?,
-        val color: Int,
-        val accountHint: String?
+    data class PhoneCalendarSnapshot(
+        val events: List<CalendarRenderEvent>,
+        val accountHint: String
     )
 
     fun sync(context: Context): Boolean {
         return runCatching {
             val now = System.currentTimeMillis()
             val bounds = threeDayBounds(now)
-            val events = readPhoneCalendarEvents(context, bounds.first, bounds.second)
-            val accountHint = events.firstNotNullOfOrNull { it.accountHint } ?: "phone"
+            val snapshot = loadSnapshot(context, bounds.first, bounds.second)
 
             val dataRequest = PutDataMapRequest.create(PATH_CALENDAR_SYNC).apply {
                 dataMap.putLong(KEY_UPDATED_AT, now)
-                dataMap.putString(KEY_ACCOUNT_HINT, accountHint)
-                dataMap.putString(KEY_EVENTS_JSON, toJson(events))
+                dataMap.putString(KEY_ACCOUNT_HINT, snapshot.accountHint)
+                dataMap.putString(KEY_EVENTS_JSON, toJson(snapshot.events))
             }.asPutDataRequest().setUrgent()
 
             Tasks.await(Wearable.getDataClient(context).putDataItem(dataRequest))
             true
         }.getOrDefault(false)
+    }
+
+    fun loadSnapshot(context: Context, startMillis: Long, endMillis: Long): PhoneCalendarSnapshot {
+        val events = readPhoneCalendarEvents(context, startMillis, endMillis)
+        val accountHint = readAccountHint(context, startMillis, endMillis) ?: "phone"
+        return PhoneCalendarSnapshot(events = events, accountHint = accountHint)
     }
 
     private fun threeDayBounds(now: Long): Pair<Long, Long> {
@@ -57,13 +59,13 @@ object CalendarSyncTransmitter {
         return start to end
     }
 
-    private fun readPhoneCalendarEvents(context: Context, startMillis: Long, endMillis: Long): List<PhoneEvent> {
+    private fun readPhoneCalendarEvents(context: Context, startMillis: Long, endMillis: Long): List<CalendarRenderEvent> {
         val uri = CalendarContract.Instances.CONTENT_URI.buildUpon()
             .appendPath(startMillis.toString())
             .appendPath(endMillis.toString())
             .build()
 
-        val events = mutableListOf<PhoneEvent>()
+        val events = mutableListOf<CalendarRenderEvent>()
 
         context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
             val eventIdIndex = firstExistingColumnIndex(cursor, listOf("event_id", CalendarContract.Instances.EVENT_ID, "_id"))
@@ -73,10 +75,6 @@ object CalendarSyncTransmitter {
             val displayColorIndex = cursor.getColumnIndex(CalendarContract.Instances.DISPLAY_COLOR)
             val eventColorIndex = cursor.getColumnIndex("eventColor")
             val calendarColorIndex = cursor.getColumnIndex("calendar_color")
-            val accountIndex = firstExistingColumnIndex(
-                cursor,
-                listOf("ownerAccount", CalendarContract.Instances.OWNER_ACCOUNT, CalendarContract.Instances.ORGANIZER)
-            )
 
             while (cursor.moveToNext()) {
                 val start = getLongCompat(cursor, startIndex)
@@ -86,23 +84,43 @@ object CalendarSyncTransmitter {
                 }
 
                 events.add(
-                    PhoneEvent(
+                    CalendarRenderEvent(
                         eventId = getLongCompat(cursor, eventIdIndex),
                         startMillis = start,
                         endMillis = end,
                         title = if (titleIndex >= 0) cursor.getString(titleIndex) else null,
+                        isDailyRepeated = false,
                         color = resolveEventColor(
                             getNullableColorCompat(cursor, displayColorIndex),
                             getNullableColorCompat(cursor, eventColorIndex),
                             getNullableColorCompat(cursor, calendarColorIndex)
-                        ),
-                        accountHint = if (accountIndex >= 0) cursor.getString(accountIndex) else null
+                        )
                     )
                 )
             }
         }
 
         return events.sortedBy { it.startMillis }
+    }
+
+    private fun readAccountHint(context: Context, startMillis: Long, endMillis: Long): String? {
+        val uri = CalendarContract.Instances.CONTENT_URI.buildUpon()
+            .appendPath(startMillis.toString())
+            .appendPath(endMillis.toString())
+            .build()
+        context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            val accountIndex = firstExistingColumnIndex(
+                cursor,
+                listOf("ownerAccount", CalendarContract.Instances.OWNER_ACCOUNT, CalendarContract.Instances.ORGANIZER)
+            )
+            while (cursor.moveToNext()) {
+                val value = if (accountIndex >= 0) cursor.getString(accountIndex) else null
+                if (!value.isNullOrBlank()) {
+                    return value
+                }
+            }
+        }
+        return null
     }
 
     private fun firstExistingColumnIndex(cursor: Cursor, names: List<String>): Int {
@@ -140,7 +158,7 @@ object CalendarSyncTransmitter {
         return displayColor ?: eventColor ?: calendarColor ?: Color.rgb(120, 120, 120)
     }
 
-    private fun toJson(events: List<PhoneEvent>): String {
+    private fun toJson(events: List<CalendarRenderEvent>): String {
         val array = JSONArray()
         for (event in events) {
             array.put(

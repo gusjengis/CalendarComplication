@@ -52,7 +52,8 @@ import androidx.wear.tooling.preview.devices.WearDevices
 import com.example.calendarcomplication.R
 import com.example.calendarcomplication.complication.MainComplicationService
 import com.example.calendarcomplication.presentation.theme.CalendarComplicationTheme
-import com.example.calendarcomplication.settings.WatchSettingsStore
+import com.example.calendarcomplication.core.settings.CalendarSettingsStore
+import com.example.calendarcomplication.sync.SettingsSyncTransmitter
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -108,18 +109,11 @@ fun SettingsScreen() {
     val listState = rememberScalingLazyListState()
     val focusRequester = remember { FocusRequester() }
     val coroutineScope = rememberCoroutineScope()
-    var showRecurringLabels by remember {
-        mutableStateOf(WatchSettingsStore.shouldShowRecurringLabels(context))
-    }
-    var use24HourTime by remember {
-        mutableStateOf(WatchSettingsStore.use24HourTime(context))
-    }
-    var hidePastEventLabels by remember {
-        mutableStateOf(WatchSettingsStore.hidePastEventLabels(context))
-    }
+    var settings by remember { mutableStateOf(CalendarSettingsStore.load(context)) }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
+        SettingsSyncTransmitter.push(context, settings, source = "watch")
     }
 
     Box(
@@ -159,43 +153,46 @@ fun SettingsScreen() {
             item {
                 ToggleChip(
                     modifier = Modifier.fillMaxWidth(),
-                    checked = showRecurringLabels,
+                    checked = settings.showRecurringLabels,
                     onCheckedChange = { checked ->
-                        showRecurringLabels = checked
-                        WatchSettingsStore.setShowRecurringLabels(context, checked)
+                        settings = settings.copy(showRecurringLabels = checked)
+                        CalendarSettingsStore.save(context, settings)
+                        SettingsSyncTransmitter.push(context, settings, source = "watch")
                         MainComplicationService.forceUpdateNow(context)
                     },
                     label = { Text(stringResource(R.string.settings_recurring_label_title)) },
                     secondaryLabel = { Text(stringResource(R.string.settings_recurring_label_subtitle)) },
-                    toggleControl = { Switch(checked = showRecurringLabels) }
+                    toggleControl = { Switch(checked = settings.showRecurringLabels) }
                 )
             }
             item {
                 ToggleChip(
                     modifier = Modifier.fillMaxWidth(),
-                    checked = use24HourTime,
+                    checked = settings.use24HourTime,
                     onCheckedChange = { checked ->
-                        use24HourTime = checked
-                        WatchSettingsStore.setUse24HourTime(context, checked)
+                        settings = settings.copy(use24HourTime = checked)
+                        CalendarSettingsStore.save(context, settings)
+                        SettingsSyncTransmitter.push(context, settings, source = "watch")
                         MainComplicationService.forceUpdateNow(context)
                     },
                     label = { Text(stringResource(R.string.settings_24_hour_title)) },
                     secondaryLabel = { Text(stringResource(R.string.settings_24_hour_subtitle)) },
-                    toggleControl = { Switch(checked = use24HourTime) }
+                    toggleControl = { Switch(checked = settings.use24HourTime) }
                 )
             }
             item {
                 ToggleChip(
                     modifier = Modifier.fillMaxWidth(),
-                    checked = hidePastEventLabels,
+                    checked = settings.hidePastEventLabels,
                     onCheckedChange = { checked ->
-                        hidePastEventLabels = checked
-                        WatchSettingsStore.setHidePastEventLabels(context, checked)
+                        settings = settings.copy(hidePastEventLabels = checked)
+                        CalendarSettingsStore.save(context, settings)
+                        SettingsSyncTransmitter.push(context, settings, source = "watch")
                         MainComplicationService.forceUpdateNow(context)
                     },
                     label = { Text(stringResource(R.string.settings_hide_past_labels_title)) },
                     secondaryLabel = { Text(stringResource(R.string.settings_hide_past_labels_subtitle)) },
-                    toggleControl = { Switch(checked = hidePastEventLabels) }
+                    toggleControl = { Switch(checked = settings.hidePastEventLabels) }
                 )
             }
         }

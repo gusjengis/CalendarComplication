@@ -2,6 +2,9 @@ package com.example.calendarcomplication.sync
 
 import android.util.Log
 import com.example.calendarcomplication.complication.MainComplicationService
+import com.example.calendarcomplication.core.settings.CalendarSettings
+import com.example.calendarcomplication.core.settings.CalendarSettingsStore
+import com.example.calendarcomplication.core.sync.SettingsSyncContract
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.WearableListenerService
@@ -16,23 +19,43 @@ class PhoneCalendarSyncListenerService : WearableListenerService() {
                 }
 
                 val item = event.dataItem
-                if (item.uri.path != PATH_CALENDAR_SYNC) {
-                    continue
+                when (item.uri.path) {
+                    PATH_CALENDAR_SYNC -> {
+                        val map = DataMapItem.fromDataItem(item).dataMap
+                        val updatedAt = map.getLong(KEY_UPDATED_AT)
+                        val accountHint = map.getString(KEY_ACCOUNT_HINT) ?: "phone"
+                        val eventsJson = map.getString(KEY_EVENTS_JSON) ?: "[]"
+
+                        PhoneCalendarSyncStore.save(
+                            context = this,
+                            updatedAtMillis = updatedAt,
+                            accountHint = accountHint,
+                            eventsJson = eventsJson
+                        )
+                        Log.d(TAG, "Received phone calendar sync payload")
+                        MainComplicationService.forceUpdateNow(this)
+                    }
+
+                    SettingsSyncContract.PATH_SETTINGS_SYNC -> {
+                        val map = DataMapItem.fromDataItem(item).dataMap
+                        val source = map.getString(SettingsSyncContract.KEY_SOURCE)
+                        if (source == "watch") {
+                            continue
+                        }
+                        val updatedAt = map.getLong(SettingsSyncContract.KEY_UPDATED_AT)
+                        val settings = CalendarSettings(
+                            showRecurringLabels = map.getBoolean(SettingsSyncContract.KEY_SHOW_RECURRING_LABELS),
+                            use24HourTime = map.getBoolean(SettingsSyncContract.KEY_USE_24_HOUR_TIME),
+                            hidePastEventLabels = map.getBoolean(SettingsSyncContract.KEY_HIDE_PAST_EVENT_LABELS)
+                        )
+                        if (CalendarSettingsStore.saveIfNewer(this, settings, updatedAt)) {
+                            Log.d(TAG, "Applied settings from phone")
+                            MainComplicationService.forceUpdateNow(this)
+                        }
+                    }
+
+                    else -> continue
                 }
-
-                val map = DataMapItem.fromDataItem(item).dataMap
-                val updatedAt = map.getLong(KEY_UPDATED_AT)
-                val accountHint = map.getString(KEY_ACCOUNT_HINT) ?: "phone"
-                val eventsJson = map.getString(KEY_EVENTS_JSON) ?: "[]"
-
-                PhoneCalendarSyncStore.save(
-                    context = this,
-                    updatedAtMillis = updatedAt,
-                    accountHint = accountHint,
-                    eventsJson = eventsJson
-                )
-                Log.d(TAG, "Received phone calendar sync payload")
-                MainComplicationService.forceUpdateNow(this)
             }
         }
     }

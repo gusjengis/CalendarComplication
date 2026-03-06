@@ -26,7 +26,10 @@ import androidx.wear.watchface.complications.data.PlainComplicationText
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
-import com.example.calendarcomplication.settings.WatchSettingsStore
+import com.example.calendarcomplication.core.render.CalendarPreviewRenderer
+import com.example.calendarcomplication.core.render.CalendarRenderEvent
+import com.example.calendarcomplication.core.render.CalendarRenderProbe
+import com.example.calendarcomplication.core.settings.CalendarSettingsStore
 import com.example.calendarcomplication.sync.PhoneCalendarSyncStore
 import java.util.Collections
 import java.util.Locale
@@ -102,7 +105,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
         )
 
         return PhotoImageComplicationData.Builder(
-            photoImage = Icon.createWithBitmap(generateStatusBitmap(preview)),
+            photoImage = Icon.createWithBitmap(generateUnifiedBitmap(preview)),
             contentDescription = PlainComplicationText.Builder("Calendar ring preview").build()
         ).build()
     }
@@ -119,9 +122,32 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
         Log.d(TAG, "Calendar probe: ${probe.status} (${probe.detail})")
 
         return PhotoImageComplicationData.Builder(
-            photoImage = Icon.createWithBitmap(generateStatusBitmap(probe)),
+            photoImage = Icon.createWithBitmap(generateUnifiedBitmap(probe)),
             contentDescription = PlainComplicationText.Builder("Calendar ring status").build()
         ).build()
+    }
+
+    private fun generateUnifiedBitmap(probe: CalendarProbeResult): Bitmap {
+        val settings = CalendarSettingsStore.load(this)
+        val renderEvents = probe.dayEvents.map { event ->
+            CalendarRenderEvent(
+                eventId = event.eventId,
+                startMillis = event.startMillis,
+                endMillis = event.endMillis,
+                title = event.title,
+                isDailyRepeated = event.isDailyRepeated,
+                color = event.color
+            )
+        }
+        return CalendarPreviewRenderer.render(
+            settings = settings,
+            probe = CalendarRenderProbe(
+                dayEvents = renderEvents,
+                dayStartMillis = probe.dayStartMillis,
+                dayEndMillis = probe.dayEndMillis,
+                nowMillis = System.currentTimeMillis()
+            )
+        )
     }
 
     override fun onComplicationActivated(complicationInstanceId: Int, type: ComplicationType) {
@@ -478,9 +504,10 @@ class MainComplicationService : SuspendingComplicationDataSourceService() {
         val canvas = Canvas(bitmap)
         val sizeF = IMAGE_SIZE.toFloat()
         val center = sizeF / 2f
-        val showRecurringLabels = WatchSettingsStore.shouldShowRecurringLabels(this)
-        val hidePastEventLabels = WatchSettingsStore.hidePastEventLabels(this)
-        val use24HourTime = WatchSettingsStore.use24HourTime(this)
+        val settings = CalendarSettingsStore.load(this)
+        val showRecurringLabels = settings.showRecurringLabels
+        val hidePastEventLabels = settings.hidePastEventLabels
+        val use24HourTime = settings.use24HourTime
         val nowMillis = System.currentTimeMillis()
 
         val bgPaint = Paint().apply {

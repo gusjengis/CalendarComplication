@@ -1,0 +1,14 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /home/gusjengis/Documents/Code/CalendarComplication/core/src/main/AndroidManifest.xml:2:1-13
+INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/core/src/main/AndroidManifest.xml:2:1-13
+	package
+		INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/core/src/main/AndroidManifest.xml
+uses-sdk
+INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/core/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/core/src/main/AndroidManifest.xml
+INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/core/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/core/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /home/gusjengis/Documents/Code/CalendarComplication/core/src/main/AndroidManifest.xml
