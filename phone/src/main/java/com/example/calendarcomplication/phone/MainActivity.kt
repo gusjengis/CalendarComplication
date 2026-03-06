@@ -5,9 +5,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.Configuration
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -41,6 +43,7 @@ class MainActivity : ComponentActivity() {
             hidePastEventLabels = true
         )
     )
+    private var isSettingsReceiverRegistered = false
 
     private val settingsUpdatedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -60,8 +63,13 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, true)
         window.statusBarColor = Color.BLACK
 
+        val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
         val container = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
+            orientation = if (isLandscape) LinearLayout.HORIZONTAL else LinearLayout.VERTICAL
+            if (isLandscape) {
+                isBaselineAligned = false
+            }
             setPadding(24, 24, 24, 24)
             setBackgroundColor(Color.BLACK)
         }
@@ -69,9 +77,7 @@ class MainActivity : ComponentActivity() {
         previewView = ImageView(this).apply {
             adjustViewBounds = true
             scaleType = ImageView.ScaleType.FIT_CENTER
-            minimumHeight = 450
-            minimumWidth = 450
-            setPadding(0, 6, 0, 16)
+            setPadding(0, 6, 0, if (isLandscape) 0 else 16)
         }
 
         statusView = TextView(this).apply {
@@ -81,32 +87,53 @@ class MainActivity : ComponentActivity() {
         }
 
         val settingsView = ComposeView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                0,
-                1f
-            )
-            setContent {
-                MaterialTheme {
-                    ComplicationSettingsPanel(
-                        settings = settingsState.value,
-                        title = stringResource(R.string.settings_title),
-                        recurringTitle = stringResource(R.string.settings_recurring_label_title),
-                        recurringSubtitle = stringResource(R.string.settings_recurring_label_subtitle),
-                        twentyFourHourTitle = stringResource(R.string.settings_24_hour_title),
-                        twentyFourHourSubtitle = stringResource(R.string.settings_24_hour_subtitle),
-                        hidePastTitle = stringResource(R.string.settings_hide_past_labels_title),
-                        hidePastSubtitle = stringResource(R.string.settings_hide_past_labels_subtitle),
-                        onSettingsChange = { newSettings -> applySettingsAndSync(newSettings) }
-                    )
-                }
+            layoutParams = if (isLandscape) {
+                LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f)
+            } else {
+                LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f)
             }
         }
 
-        container.addView(previewView)
-        container.addView(statusView)
-        container.addView(settingsView)
+        if (isLandscape) {
+            val previewColumn = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = Gravity.START
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
+                )
+            }
+            previewView.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                0,
+                1f
+            )
+            previewColumn.addView(previewView)
+            previewColumn.addView(statusView)
+            container.addView(previewColumn)
+            container.addView(settingsView)
+        } else {
+            container.addView(previewView)
+            container.addView(statusView)
+            container.addView(settingsView)
+        }
         setContentView(container)
+
+        settingsView.setContent {
+            MaterialTheme {
+                ComplicationSettingsPanel(
+                    settings = settingsState.value,
+                    title = stringResource(R.string.settings_title),
+                    recurringTitle = stringResource(R.string.settings_recurring_label_title),
+                    recurringSubtitle = stringResource(R.string.settings_recurring_label_subtitle),
+                    twentyFourHourTitle = stringResource(R.string.settings_24_hour_title),
+                    twentyFourHourSubtitle = stringResource(R.string.settings_24_hour_subtitle),
+                    hidePastTitle = stringResource(R.string.settings_hide_past_labels_title),
+                    hidePastSubtitle = stringResource(R.string.settings_hide_past_labels_subtitle),
+                    onSettingsChange = { newSettings -> applySettingsAndSync(newSettings) }
+                )
+            }
+        }
 
         CalendarSyncScheduler.schedulePeriodic(this)
         settingsState.value = CalendarSettingsStore.load(this)
@@ -122,12 +149,15 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        ContextCompat.registerReceiver(
-            this,
-            settingsUpdatedReceiver,
-            IntentFilter(SettingsSyncContract.ACTION_SETTINGS_UPDATED),
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
+        if (!isSettingsReceiverRegistered) {
+            ContextCompat.registerReceiver(
+                this,
+                settingsUpdatedReceiver,
+                IntentFilter(SettingsSyncContract.ACTION_SETTINGS_UPDATED),
+                ContextCompat.RECEIVER_NOT_EXPORTED
+            )
+            isSettingsReceiverRegistered = true
+        }
         settingsState.value = CalendarSettingsStore.load(this)
         if (checkSelfPermission(Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
             refreshPreview()
@@ -135,7 +165,10 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onPause() {
-        unregisterReceiver(settingsUpdatedReceiver)
+        if (isSettingsReceiverRegistered) {
+            runCatching { unregisterReceiver(settingsUpdatedReceiver) }
+            isSettingsReceiverRegistered = false
+        }
         super.onPause()
     }
 
