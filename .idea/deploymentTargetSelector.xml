@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-03-06T00:28:17.233320352Z">
+        <DropdownSelection timestamp="2026-03-06T05:05:44.105226424Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/home/gusjengis/.config/.android/avd/Medium_Phone.avd" />
+              <DeviceId pluginId="Default" identifier="serial=192.168.1.20:45247;connection=cfce781d" />
             </handle>
           </Target>
         </DropdownSelection>
@@ -18,10 +18,10 @@
       </SelectionState>
       <SelectionState runConfigName="phone">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-03-06T04:36:45.723511976Z">
+        <DropdownSelection timestamp="2026-03-06T05:05:51.133711771Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="Default" identifier="serial=192.168.1.52:41041;connection=144d0bdc" />
+              <DeviceId pluginId="Default" identifier="serial=192.168.1.20:45247;connection=cfce781d" />
             </handle>
           </Target>
         </DropdownSelection>

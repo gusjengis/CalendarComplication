@@ -247,8 +247,9 @@ object CalendarPreviewRenderer {
                     .filter { it.startMillis <= nowMillis && nowMillis < it.endMillis }
                     .minByOrNull { it.endMillis }
                 if (activeEvent != null) {
-                    val remainingMillis = (activeEvent.endMillis - nowMillis).coerceAtLeast(0L)
-                    eventTimingText = "${formatDurationCompact(remainingMillis)} left"
+                    val remainingMillis =
+                        (activeEvent.event.endMillis - nowMillis).coerceAtLeast(0L)
+                    eventTimingText = formatDurationCompact(remainingMillis)
                     eventTimingColor = resolvedColorByEventIndex[activeEvent.eventIndex]
                         ?: activeEvent.event.color
                 } else {
