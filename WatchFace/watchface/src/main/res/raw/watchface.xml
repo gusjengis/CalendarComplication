@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<WatchFace width="450" height="450">
+  <Metadata key="CLOCK_TYPE" value="DIGITAL"/>
+  <Metadata key="PREVIEW_TIME" value="10:08:32"/>
+
+  <Scene backgroundColor="#ff000000">
+
+    <!-- FULL-SCREEN PHOTO_IMAGE COMPLICATION SLOT -->
+    <ComplicationSlot
+        x="0" y="0" width="450" height="450"
+        slotId="0"
+        name="background_photo"
+        displayName="Background"
+        supportedTypes="PHOTO_IMAGE EMPTY"
+        isCustomizable="true">
+
+      <!-- Full-screen bounding box -->
+      <BoundingBox
+          x="0" y="0"
+          width="450" height="450"
+          outlinePadding="0"/>
+
+      <DefaultProviderPolicy
+          primaryProvider="com.example.calendarcomplication/com.example.calendarcomplication.complication.MainComplicationService"
+          primaryProviderType="PHOTO_IMAGE"
+          defaultSystemProvider="EMPTY"
+          defaultSystemProviderType="EMPTY" />
+
+      <!-- PHOTO_IMAGE rendering: stretch to full face -->
+      <Complication type="PHOTO_IMAGE" name="photo_complication">
+        <PartImage
+            x="0" y="0"
+            width="450" height="450"
+            name="photo_image">
+          <Image resource="[COMPLICATION.PHOTO_IMAGE]"/>
+        </PartImage>
+      </Complication>
+
+      <!-- OPTIONAL: EMPTY state (subtle border when nothing is set) -->
+      <Complication type="EMPTY" name="empty_state">
+        <Group
+            x="0" y="0"
+            width="450" height="450"
+            name="empty_comp"
+            alpha="80">
+          <PartDraw x="0" y="0" width="450" height="450">
+            <RoundRectangle
+                x="5" y="5"
+                width="440" height="440"
+                cornerRadius="220">
+              <Stroke color="#44FFFFFF" thickness="2"/>
+            </RoundRectangle>
+          </PartDraw>
+        </Group>
+      </Complication>
+
+    </ComplicationSlot>
+
+    <!-- Your clock/text can go here later, on top of the background -->
+    <!--
+    <DigitalClock x="0" y="0" width="450" height="450">
+      <TimeText format="hh:mm" hourFormat="SYNC_TO_DEVICE"
+          align="CENTER" x="0" y="175" width="450" height="100" alpha="255">
+        <Variant mode="AMBIENT" target="alpha" value="0"/>
+        <Font family="SYNC_TO_DEVICE" size="40" weight="NORMAL"
+            slant="NORMAL" color="#FFFFFFFF"/>
+      </TimeText>
+    </DigitalClock>
+    -->
+
+  </Scene>
+</WatchFace>
